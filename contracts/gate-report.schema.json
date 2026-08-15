@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schemaVersion","courseId","mode","status","releaseDecision","checks","promotionBlockers"],
+  "properties": {"schemaVersion": {"const": "1.0.0"},"courseId": {"type": "string"},"mode": {"enum": ["fast","full"]},"status": {"enum": ["PASS","FAIL"]},"releaseDecision": {"enum": ["HOLD","APPROVED"]},"checks": {"type": "array"},"promotionBlockers": {"type": "array"}},
+  "additionalProperties": true
+}

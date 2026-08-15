@@ -1,0 +1,19 @@
+name: Package Candidate
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Public Full QA first
+        run: python3 tools/lessonctl/lessonctl.py qa full --course feed-why --json out/gate-report-full.json
+      - name: Require approved private-source hydration
+        run: |
+          echo "BLOCKED: actual rights-unverified PPTX/HTML/ZIP are intentionally absent from public Git." >&2
+          echo "Candidate packaging must run after exact source hydration in an approved private/local environment." >&2
+          echo "No package was invented and no release artifact was generated." >&2
+          exit 1

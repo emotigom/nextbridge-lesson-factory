@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0.0",
+  "courseId": "feed-why",
+  "version": "0.4",
+  "stage": "TECH_QA",
+  "releaseDecision": "HOLD",
+  "quality": {"overall": null,"domains": {}},
+  "rights": {"status": "UNVERIFIED","publicDistributionApproved": false},
+  "approval": {"reviewer": null,"approvedAt": null},
+  "assets": [],
+  "r2": {"keyTemplate": "courses/{courseId}/{version}/{sha256}/{filename}","latestKey": "courses/feed-why/latest.json"},
+  "ssot": {"status": "STALE_METADATA"},
+  "fieldMetrics": {"instructorRehearsal": {"plannedMinutes": null,"actualMinutes": null},"studentPilot": {"minimumOutputCompletionPct": null,"saveSubmitSuccessPct": null,"privacyCriticalIncidentCount": null}},
+  "manualEvidence": [
+    {"gate": "BROWSER_FILE_SMOKE","status": "PENDING","subjectSha256": "6ecb7cf66bd9490fcd06ec1de08e88c71f5f6888815bb9ff741a28d0c8216741"},
+    {"gate": "VIEWPORT_1440_900_375_812","status": "PENDING","subjectSha256": "6ecb7cf66bd9490fcd06ec1de08e88c71f5f6888815bb9ff741a28d0c8216741"},
+    {"gate": "JSON_ROUNDTRIP_PRINT","status": "PENDING","subjectSha256": "6ecb7cf66bd9490fcd06ec1de08e88c71f5f6888815bb9ff741a28d0c8216741"},
+    {"gate": "WINDOWS_POWERPOINT_SMOKE","status": "PENDING","subjectSha256": "48580e36704d352dad95d9ddccf3ab980fccf1446835baeb97c016f7120f4986"},
+    {"gate": "FONT_PORTABILITY_REFLOW","status": "PENDING","subjectSha256": "48580e36704d352dad95d9ddccf3ab980fccf1446835baeb97c016f7120f4986"},
+    {"gate": "INDEPENDENT_INSTRUCTOR_REHEARSAL","status": "PENDING","subjectSha256": "d337f688793d902b09b26173df18ff83d4f7db575052354c8ad4515cfeec4d3d"},
+    {"gate": "STUDENT_FIELD_PILOT","status": "PENDING","subjectSha256": "d337f688793d902b09b26173df18ff83d4f7db575052354c8ad4515cfeec4d3d"}
+  ]
+}

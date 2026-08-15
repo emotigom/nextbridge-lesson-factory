@@ -1,0 +1,11 @@
+{
+  "releases": [
+    {
+      "courseId": "feed-why",
+      "version": "0.4",
+      "stage": "TECH_QA",
+      "releaseDecision": "HOLD",
+      "publicArtifacts": []
+    }
+  ]
+}

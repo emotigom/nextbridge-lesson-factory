@@ -1,0 +1,34 @@
+name: QA Full
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'candidate-*'
+permissions:
+  contents: read
+jobs:
+  full-public-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Zero-cost budget guard
+        run: python3 tools/lessonctl/lessonctl.py budget check
+      - name: Full public QA
+        run: python3 tools/lessonctl/lessonctl.py qa full --course feed-why --json out/gate-report-full.json
+      - name: Candidate tags require private-source Full replay
+        if: startsWith(github.ref, 'refs/tags/candidate-')
+        run: |
+          echo "Candidate tag cannot pass without the frozen private package replay." >&2
+          echo "Hydrate the exact approved private source in an approved environment and run qa full --private-package." >&2
+          exit 1
+      - name: Evidence (max 3 days)
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: qa-full-${{ github.run_id }}
+          path: out/
+          retention-days: 3
+          if-no-files-found: warn

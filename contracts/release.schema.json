@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nextbridge.example/contracts/release.schema.json",
+  "title": "Nextbridge Release Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion","courseId","version","stage","releaseDecision","quality","rights","approval","assets","r2","ssot","fieldMetrics","manualEvidence"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "courseId": {"type": "string","pattern": "^[a-z0-9][a-z0-9-]{2,63}$"},
+    "version": {"type": "string"},
+    "stage": {"enum": ["DRAFT","CONTENT_QA","TECH_QA","INSTRUCTOR_PILOT","FIELD_PILOT","FIELD_READY","CANONICAL"]},
+    "releaseDecision": {"enum": ["HOLD","APPROVED"]},
+    "quality": {"type": "object","required": ["overall","domains"],"properties": {"overall": {"type": ["number","null"],"minimum": 0,"maximum": 100},"domains": {"type": "object"}},"additionalProperties": false},
+    "rights": {"type": "object","required": ["status","publicDistributionApproved"],"properties": {"status": {"enum": ["UNVERIFIED","VERIFIED"]},"publicDistributionApproved": {"type": "boolean"}},"additionalProperties": false},
+    "approval": {"type": "object","required": ["reviewer","approvedAt"],"properties": {"reviewer": {"type": ["string","null"]},"approvedAt": {"type": ["string","null"]}},"additionalProperties": false},
+    "assets": {"type": "array","items": {"type": "object","additionalProperties": false,"required": ["file","role","size","mediaType","sha256"],"properties": {"file": {"type": "string"},"role": {"type": "string"},"size": {"type": "integer","minimum": 0},"mediaType": {"type": "string"},"sha256": {"type": "string","pattern": "^[0-9a-f]{64}$"}}}},
+    "r2": {"type": "object","additionalProperties": false,"required": ["keyTemplate","latestKey"],"properties": {"keyTemplate": {"const": "courses/{courseId}/{version}/{sha256}/{filename}"},"latestKey": {"type": "string","pattern": "^courses/[a-z0-9-]+/latest\\.json$"}}},
+    "manualEvidence": {"type": "array","items": {"type": "object","required": ["gate","status","subjectSha256"],"properties": {"gate": {"type": "string"},"status": {"enum": ["PENDING","PASS","FAIL","STALE"]},"subjectSha256": {"type": "string","pattern": "^[0-9a-f]{64}$"}},"additionalProperties": true}},
+    "ssot": {"type": "object","additionalProperties": false,"required": ["status"],"properties": {"status": {"enum": ["SYNCED","STALE_METADATA","CONFLICT"]}}},
+    "fieldMetrics": {"type": "object","additionalProperties": false,"required": ["instructorRehearsal","studentPilot"],"properties": {"instructorRehearsal": {"type": "object","additionalProperties": false,"required": ["plannedMinutes","actualMinutes"],"properties": {"plannedMinutes": {"type": ["number","null"],"minimum": 1},"actualMinutes": {"type": ["number","null"],"minimum": 1}}},"studentPilot": {"type": "object","additionalProperties": false,"required": ["minimumOutputCompletionPct","saveSubmitSuccessPct","privacyCriticalIncidentCount"],"properties": {"minimumOutputCompletionPct": {"type": ["number","null"],"minimum": 0,"maximum": 100},"saveSubmitSuccessPct": {"type": ["number","null"],"minimum": 0,"maximum": 100},"privacyCriticalIncidentCount": {"type": ["integer","null"],"minimum": 0}}}}}
+  }
+}
