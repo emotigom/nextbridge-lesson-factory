@@ -59,3 +59,7 @@
 ## 사람 전용
 
 교육적 최종 정확성, 학생 정서·개인정보 안전, 강사 대본 자연스러움, 실제 Windows PowerPoint, 학교 브라우저·망·폰트·프로젝터·인쇄, 비저자 리허설, 학생 파일럿은 자동 PASS하지 않는다.
+
+## Stage promotion guard
+
+`releaseDecision`과 stage를 사람이 직접 문자열로 바꾼 것만으로 승격되지 않는다. `lessonctl stage check`가 순차 상태 전이와 private manual evidence의 현재 subject SHA를 함께 검사한다. 세부 증거 계약은 `docs/gates/manual-evidence.md`를 따른다.

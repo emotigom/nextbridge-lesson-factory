@@ -39,3 +39,15 @@ python3 tools/lessonctl/lessonctl.py qa full \
 ## R2 / Cloudflare 안전 경계
 
 `tools/package/r2_publish.py`는 `HOLD`, FIELD_READY 미만, 품질/권리/SSOT/사람 Gate/파일럿 지표 미충족 release를 hard fail한다. 기본 실행은 dry-run이며 실제 R2 write는 production 승인과 명시적 `--execute` 없이는 수행하지 않는다. 현재 저장소 bootstrap PR에서는 Cloudflare production 배포나 R2 write를 실행하지 않는다.
+
+## 수동 Gate 증거와 단계 승격
+
+수동 Gate는 실제 사람이 수행하고, `lessonctl`은 그 증거가 현재 source SHA를 대상으로 했는지만 검증합니다.
+
+```bash
+./lessonctl evidence subject --course feed-why --gate BROWSER_FILE_SMOKE
+./lessonctl evidence verify --course feed-why --file /secure/evidence/browser.json
+./lessonctl stage check --course feed-why --to INSTRUCTOR_PILOT --evidence-dir /secure/evidence
+```
+
+실제 증거 파일은 public Git에 넣지 않습니다. main 직접 반영도 `.github/workflows/qa-main.yml`의 Full public QA를 통과해야 합니다.

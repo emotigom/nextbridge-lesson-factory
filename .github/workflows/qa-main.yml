@@ -1,0 +1,33 @@
+name: QA Main
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: qa-main
+  cancel-in-progress: false
+jobs:
+  full-public-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Zero-cost budget guard
+        run: python3 tools/lessonctl/lessonctl.py budget check
+      - name: Full public QA
+        run: python3 tools/lessonctl/lessonctl.py qa full --course feed-why --json out/gate-report-main.json
+      - name: Worker syntax
+        run: node --check worker/src/index.js
+      - name: Failure evidence only (max 3 days)
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: qa-main-failure-${{ github.run_id }}
+          path: out/
+          retention-days: 3
+          if-no-files-found: warn

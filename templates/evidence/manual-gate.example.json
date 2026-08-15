@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0.0",
+  "courseId": "feed-why",
+  "gate": "BROWSER_FILE_SMOKE",
+  "status": "PASS",
+  "subjectSha256": "6ecb7cf66bd9490fcd06ec1de08e88c71f5f6888815bb9ff741a28d0c8216741",
+  "capturedAt": "2026-08-15T00:00:00+09:00",
+  "reviewer": "EXAMPLE_ONLY",
+  "environment": {
+    "platform": "Windows 11",
+    "application": "Chrome or Edge",
+    "version": "EXAMPLE_ONLY"
+  },
+  "evidenceRefs": [
+    "private-r2://EXAMPLE_ONLY/manual-evidence.json"
+  ],
+  "notes": "Template only. Do not treat this file as real evidence."
+}
