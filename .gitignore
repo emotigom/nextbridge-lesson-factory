@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+out/
+.cache/
+node_modules/
+.wrangler/
+.dev.vars
+.env
+*.local
+*.private
+candidate-input/
+private-evidence/

@@ -1,0 +1,40 @@
+{
+  "courseId": "feed-why",
+  "title": "내 피드는 왜 이래? 4차시",
+  "version": "v1.2.1 / prototype v0.4",
+  "stage": "TECH_QA",
+  "releaseDecision": "HOLD",
+  "note": "자동 무결성 근거는 재현되었지만 실제 브라우저·PowerPoint·폰트·비저자 리허설·학생 파일럿이 남아 있습니다.",
+  "gates": [
+    {
+      "name": "Golden runtime",
+      "status": "PASS",
+      "detail": "34/34 · matrix 108/108"
+    },
+    {
+      "name": "5장 prototype",
+      "status": "PASS",
+      "detail": "5 slides · 5 notes · overflow evidence 0"
+    },
+    {
+      "name": "SSOT sync",
+      "status": "HOLD",
+      "detail": "Notion prototype metadata stale"
+    },
+    {
+      "name": "Manual environment",
+      "status": "PENDING",
+      "detail": "Chrome/Edge, Windows PowerPoint, fonts"
+    },
+    {
+      "name": "Instructor pilot",
+      "status": "PENDING",
+      "detail": "non-author rehearsal"
+    },
+    {
+      "name": "Field pilot",
+      "status": "PENDING",
+      "detail": "student completion/save/submit metrics"
+    }
+  ]
+}

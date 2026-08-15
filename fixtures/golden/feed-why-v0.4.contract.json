@@ -1,0 +1,20 @@
+{
+  "fixtureSchemaVersion": "1.0.0",
+  "courseId": "feed-why",
+  "packageVersion": "0.4",
+  "publicBinaryIncluded": false,
+  "expected": {
+    "packageSha256": "e8b831e36b05c4d6aaaac94c7a2c7ebc03236e46368ff07fd877fc3347ed7e45",
+    "runtimeHtmlSha256": "6ecb7cf66bd9490fcd06ec1de08e88c71f5f6888815bb9ff741a28d0c8216741",
+    "stateRunnerSha256": "d9b9b3055780895f2e1e643919425d76533714c814a12b12fcf9d9ba86b4baac",
+    "runtimeQaSha256": "b4b52bc12686059b783b79426cfa71aaad8ca71fdf9fe78b8de7b30b007faad6",
+    "prototypePptxSha256": "48580e36704d352dad95d9ddccf3ab980fccf1446835baeb97c016f7120f4986",
+    "runtimeChecks": {"passed": 34,"total": 34,"supportedMatrixPassed": 108,"supportedMatrixTotal": 108},
+    "prototype": {"slides": 5,"notes": 5,"overflow": 0,"sourceSlides": [4,5,10,20,27],"baselinePptxSha256": "72a2d8fa5660f07ebd7381cbbe56fa97ead81b556e1a266da9eb0efe4bcea62d","visibleRenderPixelEqual": true,"previewPdfSha256": "386ef1445bb8d409a2172cbf41d96bd2b82d642fce34ef181e041c09346b54df"},
+    "stage": "TECH_QA",
+    "nextStageCandidate": "INSTRUCTOR_PILOT",
+    "releaseDecision": "HOLD"
+  },
+  "manualGatesStillRequired": ["Windows Chrome/Edge file:// console errors = 0","1440x900 and 375x812 actual UI","save -> new team -> JSON import roundtrip","final card print preview without clipping","Windows PowerPoint open/notes/slideshow/PDF/save/reopen","font portability/full reflow","independent instructor rehearsal","student pilot"],
+  "provenance": "Actual ZIP/PPTX/HTML stay outside public Git until rights and distribution approval. This contract records only verified hashes and expected regression facts."
+}

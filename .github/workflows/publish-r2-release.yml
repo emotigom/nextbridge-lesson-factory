@@ -1,0 +1,39 @@
+name: Publish R2 Release
+on:
+  workflow_dispatch:
+    inputs:
+      manifest:
+        description: repository path to an approved release manifest
+        required: true
+        default: releases/manifests/feed-why-v0.4.example.json
+      root:
+        description: hydrated directory containing every manifest asset
+        required: true
+        default: candidate-output
+      execute:
+        description: perform R2 writes after all release gates and production approval
+        required: true
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  release-guard:
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      R2_RELEASE_BUCKET: ${{ secrets.R2_RELEASE_BUCKET }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      RELEASE_APPROVED: ${{ inputs.execute && '1' || '0' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: RELEASE_APPROVED hard gate
+        run: python3 tools/lessonctl/lessonctl.py release verify --manifest '${{ inputs.manifest }}' --root '${{ inputs.root }}' --require-approved
+      - name: R2 immutable publish plan
+        if: ${{ !inputs.execute }}
+        run: python3 tools/package/r2_publish.py --manifest '${{ inputs.manifest }}' --root '${{ inputs.root }}' --bucket "${R2_RELEASE_BUCKET:-UNCONFIGURED_RELEASE_BUCKET}"
+      - name: Upload, re-download verify, then promote latest.json
+        if: ${{ inputs.execute }}
+        run: python3 tools/package/r2_publish.py --manifest '${{ inputs.manifest }}' --root '${{ inputs.root }}' --bucket "$R2_RELEASE_BUCKET" --execute

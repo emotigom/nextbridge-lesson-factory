@@ -1,0 +1,22 @@
+{
+  "policyVersion": "1.0.0",
+  "monthlyIncrementalBudgetUsd": 0,
+  "allowLargerRunners": false,
+  "allowWorkersPaid": false,
+  "allowCloudflareContainers": false,
+  "allowPaidSaas": false,
+  "github": {
+    "standardPublicRunnerOnly": true,
+    "pullRequestArtifactRetentionDays": 1,
+    "failureEvidenceRetentionDays": 3
+  },
+  "r2": {
+    "storageSoftLimitGbMonth": 9,
+    "classASoftLimitMonthly": 800000,
+    "classBSoftLimitMonthly": 8000000
+  },
+  "worker": {
+    "dynamicRequestSoftLimitDaily": 80000
+  },
+  "enforcementNote": "Pipeline preflight hard stop before known paid usage; provider billing systems are not guaranteed hard caps."
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nextbridge-lesson-factory",
+  "compatibility_date": "2026-08-15",
+  "main": "worker/src/index.js",
+  "assets": {
+    "directory": "./apps/dashboard",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*"
+    ]
+  }
+}

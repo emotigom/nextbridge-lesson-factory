@@ -1,0 +1,33 @@
+name: Deploy Worker
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: preview is configuration-only until production deployment is separately approved
+        required: true
+        default: preview
+        type: choice
+        options: [preview, production]
+permissions:
+  contents: read
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Zero-cost architecture guard
+        run: python3 tools/lessonctl/lessonctl.py budget check
+      - name: Static configuration and Worker syntax
+        run: |
+          python3 -m json.tool wrangler.jsonc >/dev/null
+          node --check worker/src/index.js
+      - name: Block unapproved production
+        if: inputs.target == 'production'
+        run: |
+          echo "Production deployment is not approved by the current implementation scope." >&2
+          echo "No Cloudflare command was executed." >&2
+          exit 1
+      - name: Preview build command only
+        if: inputs.target == 'preview'
+        run: echo 'npx --yes wrangler@4.34.0 deploy --dry-run'

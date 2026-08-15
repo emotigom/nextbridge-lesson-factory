@@ -1,0 +1,9 @@
+{
+  "name": "nextbridge-lesson-factory",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check:worker": "node --check worker/src/index.js",
+    "test": "python3 -m unittest discover -s tests -v"
+  }
+}

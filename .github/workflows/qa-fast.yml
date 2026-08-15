@@ -1,0 +1,47 @@
+name: QA Fast
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: qa-fast-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  impact-aware-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Zero-cost budget guard
+        run: python3 tools/lessonctl/lessonctl.py budget check
+      - name: Change impact
+        id: impact
+        run: |
+          mkdir -p out
+          python3 tools/lessonctl/lessonctl.py impact \
+            --base '${{ github.event.pull_request.base.sha }}' \
+            --head '${{ github.event.pull_request.head.sha }}' | tee out/impact.json
+          mode="$(python3 -c "import json; print(json.load(open('out/impact.json'))['recommended'])")"
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+      - name: Fast QA for low-impact change
+        if: steps.impact.outputs.mode == 'fast'
+        run: python3 tools/lessonctl/lessonctl.py qa fast --course feed-why --json out/gate-report-fast.json
+      - name: Full public QA for high-impact change
+        if: steps.impact.outputs.mode == 'full'
+        run: python3 tools/lessonctl/lessonctl.py qa full --course feed-why --json out/gate-report-full.json
+      - name: Worker syntax
+        run: node --check worker/src/index.js
+      - name: PR evidence (1 day)
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: qa-pr-${{ github.run_id }}
+          path: out/
+          retention-days: 1
+          if-no-files-found: warn
