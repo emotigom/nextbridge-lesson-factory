@@ -51,3 +51,10 @@ python3 tools/lessonctl/lessonctl.py qa full \
 ```
 
 실제 증거 파일은 public Git에 넣지 않습니다. main 직접 반영도 `.github/workflows/qa-main.yml`의 Full public QA를 통과해야 합니다.
+
+대시보드 상태 파일은 수동 편집하지 않습니다. 기계 SSOT에서 다시 생성하고 일치 여부를 검증합니다.
+
+```bash
+./lessonctl dashboard build --course feed-why
+./lessonctl dashboard verify --course feed-why
+```

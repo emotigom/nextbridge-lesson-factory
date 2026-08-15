@@ -1,40 +1,88 @@
 {
+  "schemaVersion": "1.0.0",
   "courseId": "feed-why",
   "title": "내 피드는 왜 이래? 4차시",
-  "version": "v1.2.1 / prototype v0.4",
+  "version": "v1.2.1 / vertical-prototype-v0.4",
   "stage": "TECH_QA",
   "releaseDecision": "HOLD",
-  "note": "자동 무결성 근거는 재현되었지만 실제 브라우저·PowerPoint·폰트·비저자 리허설·학생 파일럿이 남아 있습니다.",
+  "promotionBlockers": [
+    "MANUAL_GATES_PENDING",
+    "QUALITY_NOT_SCORED",
+    "RIGHTS_UNVERIFIED",
+    "SSOT_STALE_METADATA"
+  ],
   "gates": [
     {
+      "id": "GOLDEN_RUNTIME",
       "name": "Golden runtime",
       "status": "PASS",
       "detail": "34/34 · matrix 108/108"
     },
     {
+      "id": "GOLDEN_PROTOTYPE",
       "name": "5장 prototype",
       "status": "PASS",
-      "detail": "5 slides · 5 notes · overflow evidence 0"
+      "detail": "5 slides · 5 notes · overflow 0"
     },
     {
+      "id": "SSOT_SYNC",
       "name": "SSOT sync",
       "status": "HOLD",
-      "detail": "Notion prototype metadata stale"
+      "detail": "STALE_METADATA"
     },
     {
-      "name": "Manual environment",
+      "id": "QUALITY_SCORE",
+      "name": "Quality score",
       "status": "PENDING",
-      "detail": "Chrome/Edge, Windows PowerPoint, fonts"
+      "detail": "not scored"
     },
     {
-      "name": "Instructor pilot",
+      "id": "RIGHTS",
+      "name": "Rights",
       "status": "PENDING",
-      "detail": "non-author rehearsal"
+      "detail": "UNVERIFIED"
     },
     {
-      "name": "Field pilot",
+      "id": "BROWSER_FILE_SMOKE",
+      "name": "Browser file:// smoke",
       "status": "PENDING",
-      "detail": "student completion/save/submit metrics"
+      "detail": "invalidates on runtimeHtmlSha256"
+    },
+    {
+      "id": "VIEWPORT_1440_900_375_812",
+      "name": "Desktop/mobile viewport",
+      "status": "PENDING",
+      "detail": "invalidates on runtimeHtmlSha256"
+    },
+    {
+      "id": "JSON_ROUNDTRIP_PRINT",
+      "name": "JSON roundtrip + print",
+      "status": "PENDING",
+      "detail": "invalidates on runtimeHtmlSha256"
+    },
+    {
+      "id": "WINDOWS_POWERPOINT_SMOKE",
+      "name": "Windows PowerPoint smoke",
+      "status": "PENDING",
+      "detail": "invalidates on prototypePptxSha256"
+    },
+    {
+      "id": "FONT_PORTABILITY_REFLOW",
+      "name": "Font portability + reflow",
+      "status": "PENDING",
+      "detail": "invalidates on prototypePptxSha256"
+    },
+    {
+      "id": "INDEPENDENT_INSTRUCTOR_REHEARSAL",
+      "name": "Independent instructor rehearsal",
+      "status": "PENDING",
+      "detail": "invalidates on prototypePptxSha256, runtimeHtmlSha256"
+    },
+    {
+      "id": "STUDENT_FIELD_PILOT",
+      "name": "Student field pilot",
+      "status": "PENDING",
+      "detail": "invalidates on prototypePptxSha256, runtimeHtmlSha256"
     }
   ]
 }

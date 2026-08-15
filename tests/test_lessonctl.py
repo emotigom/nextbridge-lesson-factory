@@ -69,6 +69,12 @@ class TestLessonCtl(unittest.TestCase):
   cp=subprocess.run([sys.executable,str(ROOT/'tools/lessonctl/lessonctl.py'),'evidence','subject','--course','feed-why','--gate','BROWSER_FILE_SMOKE'],cwd=ROOT,text=True,capture_output=True); self.assertEqual(0,cp.returncode,cp.stderr); self.assertEqual(lc.manual_gate_subject(lc.load_jsonish(ROOT/'courses/feed-why/course.yaml'),'BROWSER_FILE_SMOKE'),json.loads(cp.stdout)['subjectSha256'])
  def test_cli_stage_check_blocks_without_private_evidence(self):
   cp=subprocess.run([sys.executable,str(ROOT/'tools/lessonctl/lessonctl.py'),'stage','check','--course','feed-why','--to','INSTRUCTOR_PILOT'],cwd=ROOT,text=True,capture_output=True); self.assertEqual(2,cp.returncode); self.assertEqual('HOLD',json.loads(cp.stdout)['status'])
+ def test_dashboard_contract_matches_course(self):
+  c=lc.load_jsonish(ROOT/'courses/feed-why/course.yaml'); self.assertTrue(lc.verify_dashboard(c)[0])
+ def test_dashboard_drift_is_hard_failure(self):
+  c=lc.load_jsonish(ROOT/'courses/feed-why/course.yaml')
+  with tempfile.TemporaryDirectory() as td:
+   d=Path(td); lc.build_dashboard(c,d); (d/'status.json').write_text('{}\n',encoding='utf-8'); ok,detail=lc.verify_dashboard(c,d); self.assertFalse(ok); self.assertIn('status.json:drift',detail)
  def _make_pptx(self,p):
   ct='<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"></Types>'
   pres='<p:presentation xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><p:sldIdLst>'+''.join(f'<p:sldId id="{255+i}" r:id="rId{i}"/>' for i in range(1,6))+'</p:sldIdLst></p:presentation>'

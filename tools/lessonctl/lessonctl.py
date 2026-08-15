@@ -8,6 +8,7 @@ from private_replay import verify_private_package
 from release_policy import verify_manifest, budget_guard, deterministic_zip, r2_key, release_policy, manual_gate_subject
 from pptx_checks import pptx_qa
 from evidence import evidence_subject, stage_check, verify_evidence
+from dashboard import build_dashboard, verify_dashboard
 
 def qa(course_id,mode,private_package=None):
     cp=course_path(course_id); course=load_jsonish(cp); checks=[]; failures=[]; blockers=[]
@@ -17,6 +18,8 @@ def qa(course_id,mode,private_package=None):
     ok,detail,g=golden_check(course); checks.append({'name':'golden_contract','status':'PASS' if ok else 'FAIL','detail':detail});
     if not ok: failures.append(detail)
     ok,detail=scan_public_safety(); checks.append({'name':'public_repo_safety','status':'PASS' if ok else 'FAIL','detail':detail});
+    if not ok: failures.append(detail)
+    ok,detail=verify_dashboard(course); checks.append({'name':'dashboard_contract','status':'PASS' if ok else 'FAIL','detail':detail});
     if not ok: failures.append(detail)
     if course['ssot']['syncStatus']!='SYNCED': blockers.append('SSOT_'+course['ssot']['syncStatus'])
     if course['quality']['status']!='SCORED' or course['quality']['overall'] is None: blockers.append('QUALITY_NOT_SCORED')
@@ -50,6 +53,7 @@ def main():
     b=sub.add_parser('budget'); bsub=b.add_subparsers(dest='budgetcmd',required=True); bsub.add_parser('check')
     ev=sub.add_parser('evidence'); evsub=ev.add_subparsers(dest='evcmd',required=True); evv=evsub.add_parser('verify'); evv.add_argument('--course',required=True); evv.add_argument('--file',required=True); evs=evsub.add_parser('subject'); evs.add_argument('--course',required=True); evs.add_argument('--gate',required=True)
     st=sub.add_parser('stage'); stsub=st.add_subparsers(dest='stagecmd',required=True); stc=stsub.add_parser('check'); stc.add_argument('--course',required=True); stc.add_argument('--to',required=True); stc.add_argument('--evidence-dir')
+    db=sub.add_parser('dashboard'); dbsub=db.add_subparsers(dest='dbcmd',required=True); dbb=dbsub.add_parser('build'); dbb.add_argument('--course',required=True); dbb.add_argument('--out-dir',default='apps/dashboard/data'); dbv=dbsub.add_parser('verify'); dbv.add_argument('--course',required=True); dbv.add_argument('--out-dir',default='apps/dashboard/data')
     a=p.parse_args()
     try:
         if a.cmd=='intake':
@@ -78,6 +82,10 @@ def main():
         if a.cmd=='stage':
             course=load_jsonish(course_path(a.course)); blockers=stage_check(course,a.to,Path(a.evidence_dir) if a.evidence_dir else None)
             print(json.dumps({'status':'PASS' if not blockers else 'HOLD','courseId':a.course,'from':course.get('stage'),'to':a.to,'blockers':blockers},ensure_ascii=False,indent=2)); sys.exit(0 if not blockers else 2)
+        if a.cmd=='dashboard':
+            course=load_jsonish(course_path(a.course)); out=ROOT/Path(a.out_dir)
+            if a.dbcmd=='build': build_dashboard(course,out); print(json.dumps({'status':'BUILT','courseId':a.course,'outDir':str(out.relative_to(ROOT))},ensure_ascii=False,indent=2)); return
+            ok,detail=verify_dashboard(course,out); print(json.dumps({'status':'PASS' if ok else 'FAIL','detail':detail},ensure_ascii=False,indent=2)); sys.exit(0 if ok else 2)
         if a.cmd=='impact': print(json.dumps(impact(a.base,a.head),ensure_ascii=False,indent=2)); return
     except QAError as e:
         print(json.dumps({'status':'FAIL','error':str(e)},ensure_ascii=False,indent=2),file=sys.stderr); sys.exit(2)
