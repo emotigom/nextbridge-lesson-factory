@@ -37,6 +37,11 @@
 - source SHA/golden contract/WIP=1
 - public repo의 금지 바이너리·기본 PII·secret-like literal scan
 - ZIP CRC, duplicate path, path traversal, Unicode normalization collision, hidden path
+- package root inventory = manifest assets + manifest + checksum file exactly; no missing/no extras
+- `CHECKSUMS_SHA256` inventory와 manifest SHA/size의 독립 Python 교차검증
+- package manifest stage/release/cost policy/15개 필수 asset role 계약
+- HTML app/build/schema/dataset/original-source SHA와 필수 UI control/sessionStorage/import-export/print 계약
+- packaged runtime QA report 34개 전부 true, 필수 안전 check 13개, supported matrix 108건 계약
 - XML/SVG/RELS/Content Types parse와 내부 relationship target
 - PPTX slide/note count, hidden/orphan, placeholder text, external relationship inventory
 - DrawingML exponent/비정상 shadow 수치, slide bounds 밖 shape 후보
