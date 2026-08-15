@@ -14,6 +14,12 @@
 
 각 Gate의 현재 `subjectSha256`와 필수 실측 항목을 출력한다. 자산 SHA가 바뀌면 이전 증거는 STALE이다.
 
+실제 시험 전에 fail-safe 증거 키트를 만들 수 있다. 생성되는 7개 템플릿은 모두 의도적으로 `status: FAIL`에서 시작하며 기존 파일이 있는 디렉터리는 덮어쓰지 않는다.
+
+```bash
+./lessonctl evidence scaffold --course feed-why --out-dir out/manual-evidence-kit
+```
+
 ## 증거 파일
 
 각 증거는 `contracts/manual-evidence.schema.json`을 따르며 `courseId`, `gate`, `status`, `subjectSha256`, `capturedAt`, `reviewer`, `environment`, `evidenceRefs`, 그리고 PASS일 경우 Gate별 `metrics`가 필요하다.

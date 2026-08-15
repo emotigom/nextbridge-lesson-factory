@@ -210,3 +210,63 @@ def evidence_plan(course_id: str):
             'status': next((g['status'] for g in course['manualGates'] if g['id'] == gate), 'PENDING'),
         })
     return {'schemaVersion':'1.0.0','courseId':course_id,'stage':course['stage'],'releaseDecision':course['releaseDecision'],'gates':gates}
+
+
+def _template_metric_value(rule: str, limit):
+    if rule == 'true':
+        return False
+    if rule == 'eq':
+        return -1 if limit == 0 else None
+    if rule in ('min', 'positive'):
+        return 0
+    return None
+
+
+def evidence_template(course: dict, gate: str):
+    if gate not in GATE_METRIC_RULES:
+        raise QAError(f'unknown manual gate: {gate}')
+    subject = manual_gate_subject(course, gate)
+    if not subject:
+        raise QAError(f'cannot resolve subject for gate {gate}')
+    metrics = {
+        name: _template_metric_value(rule, limit)
+        for name, (rule, limit) in GATE_METRIC_RULES[gate].items()
+    }
+    return {
+        'schemaVersion': '1.0.0',
+        'courseId': course['courseId'],
+        'gate': gate,
+        'status': 'FAIL',
+        'subjectSha256': subject,
+        'capturedAt': 'RECORD_AFTER_TEST',
+        'reviewer': 'RECORD_REVIEWER',
+        'environment': {'platform': 'RECORD_PLATFORM'},
+        'evidenceRefs': ['RECORD_PRIVATE_EVIDENCE_REF'],
+        'metrics': metrics,
+        'notes': 'Template only. Keep FAIL until the real test is completed and every metric is measured.',
+    }
+
+
+def scaffold_evidence(course_id: str, out_dir: Path):
+    import json
+    course = load_jsonish(course_path(course_id))
+    if out_dir.exists() and any(out_dir.iterdir()):
+        raise QAError(f'evidence scaffold target must be empty: {out_dir}')
+    out_dir.mkdir(parents=True, exist_ok=True)
+    plan = evidence_plan(course_id)
+    (out_dir / 'plan.json').write_text(json.dumps(plan, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    for gate in REQUIRED_MANUAL_GATES:
+        record = evidence_template(course, gate)
+        (out_dir / f'{gate}.json').write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    readme = (
+        f'# Manual Gate evidence kit — {course_id}\n\n'
+        'Generated from the current source lock. Every template intentionally starts with `status: FAIL`.\n\n'
+        '1. Run the real test described in `docs/gates/manual-evidence.md`.\n'
+        '2. Replace environment/reviewer/evidenceRefs and measured metrics.\n'
+        '3. Change `status` to `PASS` only after measurements meet the gate contract.\n'
+        f'4. Verify each file with `./lessonctl evidence verify --course {course_id} --file <file>`.\n'
+        f'5. Before promotion, run `./lessonctl stage check --course {course_id} --to <NEXT_STAGE> --evidence-dir <this-directory>`.\n\n'
+        'Do not store real school/student evidence in public Git.\n'
+    )
+    (out_dir / 'README.md').write_text(readme, encoding='utf-8')
+    return {'courseId': course_id, 'outDir': str(out_dir), 'templates': len(REQUIRED_MANUAL_GATES), 'status': 'SCAFFOLDED_FAIL_SAFE'}

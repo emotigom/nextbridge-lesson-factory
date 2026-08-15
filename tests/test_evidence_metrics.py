@@ -1,15 +1,15 @@
-import json, sys, tempfile, unittest
+import importlib.util, json, sys, tempfile, unittest
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools/lessonctl'))
 from core import load_jsonish
-from evidence import evidence_plan, metric_blockers, verify_evidence
+from evidence import evidence_plan, evidence_template, metric_blockers, scaffold_evidence, verify_evidence
 from release_policy import manual_gate_subject
 
 class TestEvidenceMetrics(unittest.TestCase):
     def setUp(self): self.course=load_jsonish(ROOT/'courses/feed-why/course.yaml')
     def record(self,gate,metrics):
-        return {'schemaVersion':'1.0.0','courseId':'feed-why','gate':gate,'status':'PASS','subjectSha256':manual_gate_subject(self.course,gate),'capturedAt':'2026-08-15T20:00:00+09:00','reviewer':'reviewer','environment':{'platform':'Windows 11'},'evidenceRefs':['private-r2://evidence'],'metrics':metrics}
+        return {'schemaVersion':'1.0.0','courseId':'feed-why','gate':gate,'status':'PASS','subjectSha256':manual_gate_subject(self.course,gate),'capturedAt':'2026-08-15T20:00:00+09:00','reviewer':'reviewer','environment':{'platform':'Windows 11'},'evidenceRefs':['private-r2://evidence'], 'metrics':metrics}
     def test_browser_requires_both_browsers_and_zero_console_errors(self):
         good={'chromePass':True,'edgePass':True,'chromeConsoleErrors':0,'edgeConsoleErrors':0,'fileProtocolPass':True}
         self.assertEqual([],metric_blockers('BROWSER_FILE_SMOKE',good))
@@ -30,7 +30,16 @@ class TestEvidenceMetrics(unittest.TestCase):
         self.assertTrue(verify_evidence(self.course,self.record('WINDOWS_POWERPOINT_SMOKE',good))[0])
         bad=dict(good); bad['recoveryDialogCount']=1
         self.assertFalse(verify_evidence(self.course,self.record('WINDOWS_POWERPOINT_SMOKE',bad))[0])
+    def test_scaffold_is_fail_safe_and_subject_locked(self):
+        with tempfile.TemporaryDirectory() as td:
+            d=Path(td)/'kit'; rep=scaffold_evidence('feed-why',d); self.assertEqual('SCAFFOLDED_FAIL_SAFE',rep['status']); self.assertEqual(7,rep['templates'])
+            record=json.loads((d/'BROWSER_FILE_SMOKE.json').read_text(encoding='utf-8'))
+            self.assertEqual('FAIL',record['status']); self.assertEqual(manual_gate_subject(self.course,'BROWSER_FILE_SMOKE'),record['subjectSha256'])
+            self.assertFalse(verify_evidence(self.course,record)[0]); self.assertTrue((d/'plan.json').is_file()); self.assertTrue((d/'README.md').is_file())
+    def test_scaffold_refuses_nonempty_target(self):
+        with tempfile.TemporaryDirectory() as td:
+            d=Path(td)/'kit'; d.mkdir(); (d/'keep.txt').write_text('do not overwrite',encoding='utf-8')
+            from core import QAError
+            with self.assertRaises(QAError): scaffold_evidence('feed-why',d)
     def test_plan_exposes_current_subjects_and_required_metrics(self):
         plan=evidence_plan('feed-why'); self.assertEqual(7,len(plan['gates'])); browser=plan['gates'][0]; self.assertEqual(self.course['sourceLock']['runtimeHtmlSha256'],browser['subjectSha256']); self.assertIn('chromeConsoleErrors',browser['requiredMetrics'])
-
-if __name__=='__main__': unittest.main()
