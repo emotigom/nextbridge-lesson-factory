@@ -31,7 +31,6 @@ class TestLessonCtl(unittest.TestCase):
  def test_budget_guard_zero_cost_baseline(self):
   q=lc.budget_guard(); self.assertEqual('PASS',q['status'],q)
  def test_impact_contract_changes_require_full(self):
-  # Classification itself is covered without needing a Git repo by checking the path policy semantics in source.
   src=(ROOT/'tools/lessonctl/lessonctl.py').read_text(encoding='utf-8'); self.assertIn("contracts/",src); self.assertIn("recommended':'full'",src)
  def test_html_offline_gate(self):
   with tempfile.TemporaryDirectory() as td:
@@ -40,7 +39,16 @@ class TestLessonCtl(unittest.TestCase):
   with tempfile.TemporaryDirectory() as td:
    p=Path(td)/'s.pptx'; self._make_pptx(p); q=lc.pptx_qa(p); self.assertTrue(q['pass'],q); self.assertEqual(5,q['slides']); self.assertEqual(5,q['notes'])
  def _evidence_record(self,course,gate):
-  return {'schemaVersion':'1.0.0','courseId':course['courseId'],'gate':gate,'status':'PASS','subjectSha256':lc.manual_gate_subject(course,gate),'capturedAt':'2026-08-15T20:00:00+09:00','reviewer':'test-reviewer','environment':{'platform':'Windows 11'},'evidenceRefs':['private-r2://test/evidence.json']}
+  metrics={
+   'BROWSER_FILE_SMOKE':{'chromePass':True,'edgePass':True,'chromeConsoleErrors':0,'edgeConsoleErrors':0,'fileProtocolPass':True},
+   'VIEWPORT_1440_900_375_812':{'desktop1440x900Pass':True,'mobile375x812Pass':True},
+   'JSON_ROUNDTRIP_PRINT':{'jsonDownloadPass':True,'newTeamResetPass':True,'jsonImportPass':True,'printPreviewPass':True,'printClippingCount':0},
+   'WINDOWS_POWERPOINT_SMOKE':{'openPass':True,'notesPass':True,'slideshowPass':True,'pdfExportPass':True,'saveReopenPass':True,'recoveryDialogCount':0},
+   'FONT_PORTABILITY_REFLOW':{'cleanMachinePass':True,'missingGlyphCount':0,'reflowApproved':True},
+   'INDEPENDENT_INSTRUCTOR_REHEARSAL':{'plannedMinutes':200,'actualMinutes':200,'rescueWithin3MinPass':True},
+   'STUDENT_FIELD_PILOT':{'minimumOutputCompletionPct':85,'saveSubmitSuccessPct':90,'privacyCriticalIncidentCount':0},
+  }[gate]
+  return {'schemaVersion':'1.0.0','courseId':course['courseId'],'gate':gate,'status':'PASS','subjectSha256':lc.manual_gate_subject(course,gate),'capturedAt':'2026-08-15T20:00:00+09:00','reviewer':'test-reviewer','environment':{'platform':'Windows 11'},'evidenceRefs':['private-r2://test/evidence.json'],'metrics':metrics}
  def test_manual_evidence_subject_tracks_current_source(self):
   c=lc.load_jsonish(ROOT/'courses/feed-why/course.yaml'); gate='INDEPENDENT_INSTRUCTOR_REHEARSAL'; original=lc.manual_gate_subject(c,gate); self.assertEqual(64,len(original)); c['sourceLock']['runtimeHtmlSha256']='f'*64; self.assertNotEqual(original,lc.manual_gate_subject(c,gate))
  def test_manual_evidence_rejects_stale_subject(self):

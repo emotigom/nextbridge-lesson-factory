@@ -7,7 +7,7 @@ from core import ROOT, QAError, NOTE_SECTIONS, load_jsonish, course_path, valida
 from private_replay import verify_private_package
 from release_policy import verify_manifest, budget_guard, deterministic_zip, r2_key, release_policy, manual_gate_subject
 from pptx_checks import pptx_qa
-from evidence import evidence_subject, stage_check, verify_evidence
+from evidence import evidence_subject, evidence_plan, stage_check, verify_evidence
 from dashboard import build_dashboard, verify_dashboard
 
 def qa(course_id,mode,private_package=None):
@@ -51,7 +51,7 @@ def main():
     r=sub.add_parser('release'); rsub=r.add_subparsers(dest='relcmd',required=True); v=rsub.add_parser('verify'); v.add_argument('--manifest',required=True); v.add_argument('--root'); v.add_argument('--require-approved',action='store_true')
     im=sub.add_parser('impact'); im.add_argument('--base',required=True); im.add_argument('--head',required=True)
     b=sub.add_parser('budget'); bsub=b.add_subparsers(dest='budgetcmd',required=True); bsub.add_parser('check')
-    ev=sub.add_parser('evidence'); evsub=ev.add_subparsers(dest='evcmd',required=True); evv=evsub.add_parser('verify'); evv.add_argument('--course',required=True); evv.add_argument('--file',required=True); evs=evsub.add_parser('subject'); evs.add_argument('--course',required=True); evs.add_argument('--gate',required=True)
+    ev=sub.add_parser('evidence'); evsub=ev.add_subparsers(dest='evcmd',required=True); evv=evsub.add_parser('verify'); evv.add_argument('--course',required=True); evv.add_argument('--file',required=True); evs=evsub.add_parser('subject'); evs.add_argument('--course',required=True); evs.add_argument('--gate',required=True); evp=evsub.add_parser('plan'); evp.add_argument('--course',required=True)
     st=sub.add_parser('stage'); stsub=st.add_subparsers(dest='stagecmd',required=True); stc=stsub.add_parser('check'); stc.add_argument('--course',required=True); stc.add_argument('--to',required=True); stc.add_argument('--evidence-dir')
     db=sub.add_parser('dashboard'); dbsub=db.add_subparsers(dest='dbcmd',required=True); dbb=dbsub.add_parser('build'); dbb.add_argument('--course',required=True); dbb.add_argument('--out-dir',default='apps/dashboard/data'); dbv=dbsub.add_parser('verify'); dbv.add_argument('--course',required=True); dbv.add_argument('--out-dir',default='apps/dashboard/data')
     a=p.parse_args()
@@ -77,6 +77,8 @@ def main():
         if a.cmd=='evidence':
             if a.evcmd=='subject':
                 print(json.dumps({'courseId':a.course,'gate':a.gate,'subjectSha256':evidence_subject(a.course,a.gate)},ensure_ascii=False,indent=2)); return
+            if a.evcmd=='plan':
+                print(json.dumps(evidence_plan(a.course),ensure_ascii=False,indent=2)); return
             course=load_jsonish(course_path(a.course)); evidence=load_jsonish(Path(a.file)); ok,blockers=verify_evidence(course,evidence)
             print(json.dumps({'status':'PASS' if ok else 'FAIL','blockers':blockers,'gate':evidence.get('gate')},ensure_ascii=False,indent=2)); sys.exit(0 if ok else 2)
         if a.cmd=='stage':

@@ -20,9 +20,83 @@ STAGE_GATE_REQUIREMENTS = {
     'CANONICAL': REQUIRED_MANUAL_GATES,
 }
 
+GATE_METRIC_RULES = {
+    'BROWSER_FILE_SMOKE': {
+        'chromePass': ('true', None),
+        'edgePass': ('true', None),
+        'chromeConsoleErrors': ('eq', 0),
+        'edgeConsoleErrors': ('eq', 0),
+        'fileProtocolPass': ('true', None),
+    },
+    'VIEWPORT_1440_900_375_812': {
+        'desktop1440x900Pass': ('true', None),
+        'mobile375x812Pass': ('true', None),
+    },
+    'JSON_ROUNDTRIP_PRINT': {
+        'jsonDownloadPass': ('true', None),
+        'newTeamResetPass': ('true', None),
+        'jsonImportPass': ('true', None),
+        'printPreviewPass': ('true', None),
+        'printClippingCount': ('eq', 0),
+    },
+    'WINDOWS_POWERPOINT_SMOKE': {
+        'openPass': ('true', None),
+        'notesPass': ('true', None),
+        'slideshowPass': ('true', None),
+        'pdfExportPass': ('true', None),
+        'saveReopenPass': ('true', None),
+        'recoveryDialogCount': ('eq', 0),
+    },
+    'FONT_PORTABILITY_REFLOW': {
+        'cleanMachinePass': ('true', None),
+        'missingGlyphCount': ('eq', 0),
+        'reflowApproved': ('true', None),
+    },
+    'INDEPENDENT_INSTRUCTOR_REHEARSAL': {
+        'plannedMinutes': ('positive', None),
+        'actualMinutes': ('positive', None),
+        'rescueWithin3MinPass': ('true', None),
+    },
+    'STUDENT_FIELD_PILOT': {
+        'minimumOutputCompletionPct': ('min', 85),
+        'saveSubmitSuccessPct': ('min', 90),
+        'privacyCriticalIncidentCount': ('eq', 0),
+    },
+}
+
 
 def evidence_schema():
     return load_jsonish(ROOT / 'contracts/manual-evidence.schema.json')
+
+
+def _is_number(value):
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def metric_blockers(gate: str, metrics: dict):
+    rules = GATE_METRIC_RULES.get(gate, {})
+    blockers = []
+    if not isinstance(metrics, dict):
+        return ['EVIDENCE_METRICS_MISSING']
+    for name, (rule, limit) in rules.items():
+        if name not in metrics:
+            blockers.append('EVIDENCE_METRIC_MISSING:' + name)
+            continue
+        value = metrics[name]
+        if rule == 'true' and value is not True:
+            blockers.append('EVIDENCE_METRIC_NOT_TRUE:' + name)
+        elif rule == 'eq' and (not _is_number(value) or value != limit):
+            blockers.append(f'EVIDENCE_METRIC_NOT_{limit}:{name}')
+        elif rule == 'min' and (not _is_number(value) or value < limit):
+            blockers.append(f'EVIDENCE_METRIC_BELOW_{limit}:{name}')
+        elif rule == 'positive' and (not _is_number(value) or value <= 0):
+            blockers.append('EVIDENCE_METRIC_NOT_POSITIVE:' + name)
+    if gate == 'INDEPENDENT_INSTRUCTOR_REHEARSAL':
+        planned = metrics.get('plannedMinutes') if isinstance(metrics, dict) else None
+        actual = metrics.get('actualMinutes') if isinstance(metrics, dict) else None
+        if _is_number(planned) and _is_number(actual) and planned > 0 and abs(actual - planned) / planned > 0.10:
+            blockers.append('EVIDENCE_REHEARSAL_OUTSIDE_10_PERCENT')
+    return blockers
 
 
 def verify_evidence(course: dict, evidence: dict):
@@ -43,6 +117,8 @@ def verify_evidence(course: dict, evidence: dict):
         blockers.append('EVIDENCE_STALE_SUBJECT')
     if evidence.get('status') != 'PASS':
         blockers.append('EVIDENCE_NOT_PASS')
+    else:
+        blockers.extend(metric_blockers(gate, evidence.get('metrics')))
     return not blockers, blockers
 
 
@@ -120,3 +196,17 @@ def evidence_subject(course_id: str, gate: str):
     if not subject:
         raise QAError(f'cannot resolve subject for gate {gate}')
     return subject
+
+
+def evidence_plan(course_id: str):
+    course = load_jsonish(course_path(course_id))
+    gates = []
+    for gate in REQUIRED_MANUAL_GATES:
+        subject = manual_gate_subject(course, gate)
+        gates.append({
+            'gate': gate,
+            'subjectSha256': subject,
+            'requiredMetrics': sorted(GATE_METRIC_RULES[gate]),
+            'status': next((g['status'] for g in course['manualGates'] if g['id'] == gate), 'PENDING'),
+        })
+    return {'schemaVersion':'1.0.0','courseId':course_id,'stage':course['stage'],'releaseDecision':course['releaseDecision'],'gates':gates}
