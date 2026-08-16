@@ -1,13 +1,6 @@
 {
-  "policyVersion": "1.0.0",
+  "schemaVersion": "1.0.0",
   "introduceAfterExperience": true,
-  "terms": [
-    {"id":"signal","labels":["행동 신호","신호"]},
-    {"id":"weight","labels":["가중치"]},
-    {"id":"ranking","labels":["랭킹"]},
-    {"id":"diversity","labels":["다양성"]},
-    {"id":"novelty","labels":["새로움"]},
-    {"id":"safety","labels":["안전 규칙","안전장치"]}
-  ],
-  "rule": "A protected concept label may first appear in studentText only on the slide that declares it in conceptsIntroduced or later. Teacher notes may use the term earlier when needed for preparation."
+  "terms": [],
+  "notes": "Factory-wide default. Each design bundle may provide concept-policy.json with course-specific protected terms. Teacher notes may use preparation terminology earlier; the order gate applies to studentText."
 }
