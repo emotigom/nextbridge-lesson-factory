@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0.0",
+  "courseId": "synthetic-course",
+  "locked": true,
+  "flow": ["경험", "비교", "개념", "적용"],
+  "sessions": [
+    {
+      "session": 1,
+      "question": "무엇이 달라졌을까요?",
+      "coreExperience": "같은 후보를 다른 기준으로 비교한다.",
+      "minimumOutput": "변경 전·후 비교 카드",
+      "status": "APPROVED"
+    }
+  ]
+}
