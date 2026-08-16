@@ -34,8 +34,10 @@
     "design": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["sourcePolicy", "courseMap", "storyboardDir", "qualityRubric"],
+      "required": ["mode","proof"],
       "properties": {
+        "mode": {"enum": ["PRIVATE_PROOF","PUBLIC_BUNDLE"]},
+        "proof": {"type": "string", "minLength": 1},
         "sourcePolicy": {"type": "string", "minLength": 1},
         "courseMap": {"type": "string", "minLength": 1},
         "storyboardDir": {"type": "string", "minLength": 1},

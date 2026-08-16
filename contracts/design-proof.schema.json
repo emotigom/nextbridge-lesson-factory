@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nextbridge.example/contracts/design-proof.schema.json",
+  "title": "Nextbridge Public Design Proof",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion","courseId","designVersion","recordedAt","visibility","sources","courseMap","sessionMetrics","quality","artifacts","qa","privateEvidence","rights"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "courseId": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$"},
+    "designVersion": {"type": "string", "minLength": 1},
+    "recordedAt": {"type": "string", "minLength": 1},
+    "visibility": {"const": "summary-only-public"},
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id","role","sha256"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "role": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "courseMap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sessions"],
+      "properties": {
+        "sessions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["session","question","coreExperience","minimumOutput"],
+            "properties": {
+              "session": {"type": "integer", "minimum": 1},
+              "question": {"type": "string", "minLength": 1},
+              "coreExperience": {"type": "string", "minLength": 1},
+              "minimumOutput": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    },
+    "sessionMetrics": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["session","teachingBeats","coreSlides","bufferSlides","coreMinutes","fullMinutes"],
+        "properties": {
+          "session": {"type": "integer", "minimum": 1},
+          "teachingBeats": {"type": "integer", "minimum": 1},
+          "coreSlides": {"type": "integer", "minimum": 1},
+          "bufferSlides": {"type": "integer", "minimum": 0},
+          "coreMinutes": {"type": "number", "minimum": 1},
+          "fullMinutes": {"type": "number", "minimum": 1}
+        }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rubricVersion","overall","domains","hardGatesPass"],
+      "properties": {
+        "rubricVersion": {"type": "string", "minLength": 1},
+        "overall": {"type": "number", "minimum": 0, "maximum": 100},
+        "domains": {"type": "object"},
+        "hardGatesPass": {"type": "boolean"}
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role","sha256","size"],
+        "properties": {
+          "role": {"enum": ["final-package","presentation","practice-tool","activity-pack","media"]},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "size": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "qa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pptxSlides","pptxNotes","pptxRenderPass","pptxOverflowCount","htmlOffline","htmlExternalRuntimeRefs","activityPdfPages","manualChecksPending"],
+      "properties": {
+        "pptxSlides": {"type": "integer", "minimum": 1},
+        "pptxNotes": {"type": "integer", "minimum": 0},
+        "pptxRenderPass": {"type": "boolean"},
+        "pptxOverflowCount": {"type": "integer", "minimum": 0},
+        "htmlOffline": {"type": "boolean"},
+        "htmlExternalRuntimeRefs": {"type": "integer", "minimum": 0},
+        "activityPdfPages": {"type": "integer", "minimum": 1},
+        "manualChecksPending": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "privateEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["detailPublished","evidenceBundleSha256","finalQaReportSha256","crossArtifactReportSha256"],
+      "properties": {
+        "detailPublished": {"const": false},
+        "evidenceBundleSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "finalQaReportSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "crossArtifactReportSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "rights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status","publicDistributionApproved"],
+      "properties": {
+        "status": {"enum": ["UNVERIFIED","VERIFIED"]},
+        "publicDistributionApproved": {"type": "boolean"}
+      }
+    }
+  }
+}
