@@ -18,10 +18,11 @@ PPTX/HTML을 만들기 전에 교육 설계 자체를 먼저 잠급니다.
 
 1. `source-policy.json` — clean-room에서 읽어도 되는 자료와 복사 금지 범위를 고정
 2. `course-map.json` — 전체 차시 질문·핵심 경험·최소 산출물을 먼저 승인
-3. `storyboards/session-N.json` — 한 차시씩 상세 설계하고 사람 승인
-4. `quality-score.json` — 20항목·100점 rubric과 7개 필수 항목을 기록
+3. `concept-policy.json` — 해당 교안에서 경험 뒤에 처음 소개해야 할 보호 개념어만 지정
+4. `storyboards/session-N.json` — 한 차시씩 상세 설계하고 사람 승인
+5. `quality-score.json` — 20항목·100점 rubric과 7개 필수 항목을 기록
 
-학생 화면은 설명보다 행동을 우선하고, `신호·가중치·다양성·새로움·안전` 같은 개념어는 해당 현상을 경험한 뒤에만 처음 노출합니다. BUFFER에는 새로운 필수 개념을 넣지 않습니다.
+학생 화면은 설명보다 행동을 우선합니다. Factory 전역에는 특정 과목의 개념어를 하드코딩하지 않고, 각 교안의 `concept-policy.json`에 지정한 용어만 경험 전 선노출을 차단합니다. BUFFER에는 새로운 필수 개념을 넣지 않습니다.
 
 설계 bundle 예시는 synthetic fixture로만 공개 저장소에 둡니다.
 
@@ -31,7 +32,7 @@ python3 tools/lessonctl/content_design.py check \
   --json out/content-design-report.json
 ```
 
-이 검사는 clean-room 입력 정책, 차시 지도 잠금, 첫 학생 행동 시점, CORE/BUFFER 시간, 학생 화면의 내부 QA/보고체 문구, 경험 전 개념어 노출, 100점 rubric 합계와 필수 항목을 검사합니다. 슬라이드 수 18~22장과 Teaching Beat 6~8개는 교육 흐름을 망치지 않도록 hard fail이 아니라 warning입니다.
+이 검사는 clean-room 입력 정책, 차시 지도 잠금, 첫 학생 행동 시점, CORE/BUFFER 시간, 학생 화면의 내부 QA/보고체 문구, 교안별 보호 개념의 경험 전 노출, 100점 rubric 합계와 필수 항목을 검사합니다. 슬라이드 수 18~22장과 Teaching Beat 6~8개는 교육 흐름을 망치지 않도록 hard fail이 아니라 warning입니다.
 
 ## 빠른 실행
 
