@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "1.0.0",
+  "courseId": "feed-why",
+  "designVersion": "cleanroom-v1",
+  "recordedAt": "2026-08-16T21:40:00+09:00",
+  "visibility": "summary-only-public",
+  "sources": [
+    {"id":"clean-requirements","role":"requirements","sha256":"3743ed89579cecdc0bcffd540d5f7be6375b3eff484576c8fa45b7e96223c580"},
+    {"id":"content-design-rules","role":"design-rules","sha256":"22233c140236eb4becb27ca085baa9ec9cdf73357994b7f413d7392fc9fc5f9d"},
+    {"id":"course-map","role":"approved-course-map","sha256":"6ecae4e0f3040f8180a84919094cf488eb54efa61ee4004f675f9123bcd0b688"}
+  ],
+  "courseMap": {
+    "sessions": [
+      {"session":1,"question":"왜 내 피드엔 비슷한 게 자꾸 뜰까?","coreExperience":"내가 남기는 여러 행동이 추천의 단서가 될 수 있음을 발견","minimumOutput":"추천이 볼 수 있는 행동 카드"},
+      {"session":2,"question":"무엇을 더 중요하게 보면 추천이 달라질까?","coreExperience":"같은 후보도 중요하게 보는 기준에 따라 추천 순서가 달라짐을 직접 비교","minimumOutput":"기준 변경 전·후 추천 비교"},
+      {"session":3,"question":"좋아하는 것만 계속 보여주면 좋은 추천일까?","coreExperience":"한쪽으로 쏠린 추천을 보고 다양성·새로움·안전 규칙을 추가","minimumOutput":"더 나은 피드 개선 규칙"},
+      {"session":4,"question":"내가 추천 알고리즘을 만든다면?","coreExperience":"여러 기준을 선택하고 실제 사용자 상황에 적용하고 수정","minimumOutput":"나만의 추천 기준 카드"}
+    ]
+  },
+  "sessionMetrics": [
+    {"session":1,"teachingBeats":7,"coreSlides":18,"bufferSlides":3,"coreMinutes":45,"fullMinutes":50},
+    {"session":2,"teachingBeats":7,"coreSlides":18,"bufferSlides":3,"coreMinutes":45,"fullMinutes":50},
+    {"session":3,"teachingBeats":7,"coreSlides":18,"bufferSlides":3,"coreMinutes":45,"fullMinutes":50},
+    {"session":4,"teachingBeats":7,"coreSlides":18,"bufferSlides":3,"coreMinutes":45,"fullMinutes":50}
+  ],
+  "quality": {
+    "rubricVersion": "1.0.0",
+    "overall": 97,
+    "domains": {
+      "lessonDesign": 20,
+      "studentScreen": 19,
+      "activityParticipation": 15,
+      "conceptLearning": 15,
+      "instructorTiming": 15,
+      "visualDesign": 8,
+      "fieldReproducibility": 5
+    },
+    "hardGatesPass": true
+  },
+  "artifacts": [
+    {"role":"final-package","sha256":"c69b918ba086f7c9d9190d4a6ad16dc505223dac3062925e257876dd8cb35a82","size":7574296},
+    {"role":"presentation","sha256":"adbdde37ff69eb01284f118c975a709e9cd27a6f8c9f3ff8660a895c504ebcae","size":8355296},
+    {"role":"practice-tool","sha256":"a54f5352b8f33618f50a5672a1f0d8540b34423db9c48bcdc65c02627dbd074c","size":13355},
+    {"role":"activity-pack","sha256":"516d47e42ed3f1deffae84c52c8738f111dad132505a68a6707809f61573cb54","size":312989},
+    {"role":"media","sha256":"ae3ffadbe395b4304dcd8ac6c6f3c73e390d350d935f78b95de4c31ee585e8a8","size":140539}
+  ],
+  "qa": {
+    "pptxSlides": 96,
+    "pptxNotes": 96,
+    "pptxRenderPass": true,
+    "pptxOverflowCount": 0,
+    "htmlOffline": true,
+    "htmlExternalRuntimeRefs": 0,
+    "activityPdfPages": 4,
+    "manualChecksPending": ["WINDOWS_POWERPOINT_SMOKE","BROWSER_FILE_SMOKE"]
+  },
+  "privateEvidence": {
+    "detailPublished": false,
+    "evidenceBundleSha256": "c2628f08ce14baccd1860ba470a31d360606f53b79594b6ad9e204ef377a4a9c",
+    "finalQaReportSha256": "f4c9d664bfa59df8962309af0b93acb15f694ff2bf5d5d1b23cb757f603afa2b",
+    "crossArtifactReportSha256": "cfbdc765300b7a2723fb08cebab77508c6f554359d62eae541db737e6f9d861b"
+  },
+  "rights": {
+    "status": "UNVERIFIED",
+    "publicDistributionApproved": false
+  }
+}
