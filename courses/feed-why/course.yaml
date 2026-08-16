@@ -9,6 +9,7 @@
   "target": {"audience": "고등학교 1–3학년", "sessions": 4, "minutesPerSession": 50},
   "sourceLock": {"packageSha256": "e8b831e36b05c4d6aaaac94c7a2c7ebc03236e46368ff07fd877fc3347ed7e45","prototypePptxSha256": "48580e36704d352dad95d9ddccf3ab980fccf1446835baeb97c016f7120f4986","runtimeHtmlSha256": "6ecb7cf66bd9490fcd06ec1de08e88c71f5f6888815bb9ff741a28d0c8216741","stateRunnerSha256": "d9b9b3055780895f2e1e643919425d76533714c814a12b12fcf9d9ba86b4baac","runtimeQaSha256": "b4b52bc12686059b783b79426cfa71aaad8ca71fdf9fe78b8de7b30b007faad6"},
   "goldenFixture": "fixtures/golden/feed-why-v0.4.contract.json",
+  "design": {"mode":"PRIVATE_PROOF","proof":"courses/feed-why/design/cleanroom-v1/design-proof.json"},
   "quality": {"status": "NOT_SCORED", "overall": null, "domains": {}},
   "rights": {"status": "UNVERIFIED", "publicRepositoryApproved": false, "publicDistributionApproved": false},
   "manualGates": [
@@ -20,5 +21,5 @@
     {"id":"INDEPENDENT_INSTRUCTOR_REHEARSAL","status":"PENDING","invalidateOn":["prototypePptxSha256","runtimeHtmlSha256"]},
     {"id":"STUDENT_FIELD_PILOT","status":"PENDING","invalidateOn":["prototypePptxSha256","runtimeHtmlSha256"]}
   ],
-  "ssot": {"notionUrl": "private-notion://current-wip/feed-why","syncStatus": "STALE_METADATA","observedAt": "2026-08-15","note": "Notion WIP 속성은 시제품 v0.3을 가리키지만 검증된 실행패키지는 v0.4이다. 자동 승격 금지; Notion을 별도 승인 없이 수정하지 않는다."}
+  "ssot": {"notionUrl": "private-notion://current-wip/feed-why","syncStatus": "STALE_METADATA","observedAt": "2026-08-16","note": "공개 기계 SSOT에 clean-room-v1 design proof를 추가했다. 상세 storyboard/PPTX/HTML은 public Git에 공개하지 않는다. 기존 v0.4 runtime sourceLock과 release HOLD 상태는 새 candidate hydration 전까지 보존한다."}
 }
