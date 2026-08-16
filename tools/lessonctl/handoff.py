@@ -7,7 +7,14 @@ import shutil
 from pathlib import Path
 
 from core import ROOT, QAError, check_schema_subset, load_jsonish
-from content_design import check_bundle
+from content_design import (
+    check_bundle,
+    validate_concept_policy,
+    validate_course_map,
+    validate_quality_score,
+    validate_source_policy,
+    validate_storyboard,
+)
 
 SCHEMA = ROOT / 'contracts' / 'chatgpt-handoff.schema.json'
 
@@ -32,9 +39,8 @@ def _metadata_blockers(name, record):
 
 def expected_design_state(handoff):
     approvals = handoff['approvals']
-    sessions = approvals['sessions']
     approved_count = 0
-    for record in sessions:
+    for record in approvals['sessions']:
         if _approved(record):
             approved_count += 1
         else:
@@ -49,20 +55,25 @@ def expected_design_state(handoff):
 def validate_handoff(handoff):
     schema = load_jsonish(SCHEMA)
     blockers = [f'SCHEMA:{e}' for e in check_schema_subset(handoff, schema)]
+    warnings = []
     if blockers:
-        return {'status':'FAIL','blockers':blockers,'warnings':[]}
+        return {'status':'FAIL','blockers':blockers,'warnings':warnings}
 
     cid = handoff['courseId']
-    for name in ('sourcePolicy','courseMap','conceptPolicy'):
-        value = handoff.get(name, {})
-        if value.get('courseId') != cid:
-            blockers.append(f'COURSE_ID_MISMATCH:{name}')
+    nested = [
+        validate_source_policy(handoff['sourcePolicy']),
+        validate_course_map(handoff['courseMap']),
+        validate_concept_policy(handoff['conceptPolicy']),
+    ]
+    for report in nested:
+        blockers.extend(f'{report["name"]}:{x}' for x in report.get('blockers', []))
+        warnings.extend(f'{report["name"]}:{x}' for x in report.get('warnings', []))
+
+    if handoff['courseMap'].get('courseId') != cid:
+        blockers.append('COURSE_ID_MISMATCH:courseMap')
 
     sessions = handoff['courseMap'].get('sessions', [])
     session_numbers = [x.get('session') for x in sessions if isinstance(x, dict)]
-    if session_numbers != list(range(1, len(session_numbers) + 1)):
-        blockers.append('COURSE_MAP_SESSION_NUMBERS_NOT_CONTIGUOUS')
-
     approvals = handoff['approvals']
     blockers.extend(_metadata_blockers('courseMap', approvals.get('courseMap')))
     blockers.extend(_metadata_blockers('allContent', approvals.get('allContent')))
@@ -91,20 +102,26 @@ def validate_handoff(handoff):
 
     storyboard_sessions = []
     for storyboard in handoff.get('storyboards', []):
+        storyboard_sessions.append(storyboard.get('session'))
         if storyboard.get('courseId') != cid:
             blockers.append(f'COURSE_ID_MISMATCH:storyboard:{storyboard.get("session")}')
-        storyboard_sessions.append(storyboard.get('session'))
-        if storyboard.get('status') != 'APPROVED':
-            blockers.append(f'STORYBOARD_NOT_APPROVED:SESSION_{storyboard.get("session")}')
+        report = validate_storyboard(storyboard, handoff['conceptPolicy'])
+        blockers.extend(f'storyboard-{storyboard.get("session")}:{x}' for x in report.get('blockers', []))
+        warnings.extend(f'storyboard-{storyboard.get("session")}:{x}' for x in report.get('warnings', []))
     if storyboard_sessions != approved_sessions:
         blockers.append('STORYBOARD_SET_DOES_NOT_MATCH_APPROVED_SESSIONS')
 
     if _approved(approvals.get('allContent')) and approved_sessions != session_numbers:
         blockers.append('ALL_CONTENT_APPROVED_BEFORE_ALL_SESSIONS')
-    if _approved(approvals.get('allContent')) and handoff.get('qualityScore') is None:
+    quality = handoff.get('qualityScore')
+    if _approved(approvals.get('allContent')) and quality is None:
         blockers.append('ALL_CONTENT_REQUIRES_QUALITY_SCORE')
-    if handoff.get('qualityScore') is not None and handoff['qualityScore'].get('courseId') != cid:
-        blockers.append('COURSE_ID_MISMATCH:qualityScore')
+    if quality is not None:
+        if quality.get('courseId') != cid:
+            blockers.append('COURSE_ID_MISMATCH:qualityScore')
+        report = validate_quality_score(quality)
+        blockers.extend(f'quality:{x}' for x in report.get('blockers', []))
+        warnings.extend(f'quality:{x}' for x in report.get('warnings', []))
 
     expected = expected_design_state(handoff)
     if handoff.get('designState') != expected:
@@ -120,7 +137,7 @@ def validate_handoff(handoff):
         'designState':expected,
         'approvedSessions':approved_sessions,
         'blockers':sorted(set(blockers)),
-        'warnings':[],
+        'warnings':sorted(set(warnings)),
     }
 
 
@@ -165,10 +182,7 @@ def main():
 
     try:
         handoff = load_jsonish(Path(args.file))
-        if args.cmd == 'validate':
-            report = validate_handoff(handoff)
-        else:
-            report = materialize_handoff(handoff, Path(args.out))
+        report = validate_handoff(handoff) if args.cmd == 'validate' else materialize_handoff(handoff, Path(args.out))
         text = json.dumps(report, ensure_ascii=False, indent=2) + '\n'
         if getattr(args, 'jsonout', None):
             out = Path(args.jsonout)
