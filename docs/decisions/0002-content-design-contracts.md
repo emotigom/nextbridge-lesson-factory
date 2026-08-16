@@ -24,7 +24,7 @@
 2. `contracts/course-map.schema.json`으로 전체 차시 질문·핵심 경험·최소 산출물을 먼저 잠근다.
 3. `contracts/storyboard.schema.json`으로 슬라이드의 우선순위, 역할, 학생 화면, 학생 행동, 교사 대본, 예상 반응, 복구 문장, 연결, 시간을 분리한다.
 4. `policies/student-language.json`은 학생 화면에만 적용한다. QA·SHA 같은 기술 언어를 저장소 전체에서 금지하지 않는다.
-5. `policies/concept-order.json`의 보호 개념은 해당 slide가 `conceptsIntroduced`로 선언하기 전 studentText에 등장하면 hard fail한다.
+5. `policies/concept-order.json`은 “경험 뒤 개념 도입”이라는 전역 원칙만 가진다. 실제 보호 개념어 목록은 각 design bundle의 `concept-policy.json`이 가지며 `contracts/concept-order.schema.json`을 따른다. 해당 개념은 slide가 `conceptsIntroduced`로 선언하기 전 studentText에 등장하면 hard fail한다.
 6. BUFFER는 새로운 필수 개념을 도입할 수 없다.
 7. 첫 학생 행동은 수업 시작 3분 안에 와야 한다.
 8. 18~22장, Teaching Beat 6~8개는 목표값이며 hard fail이 아니라 warning으로 둔다.
