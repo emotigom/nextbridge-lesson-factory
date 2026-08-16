@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0.0",
+  "rubricVersion": "1.0.0",
+  "courseId": "synthetic-course",
+  "reviewer": "fixture-reviewer",
+  "criteria": {
+    "Q01":5,"Q02":5,"Q03":5,"Q04":5,"Q05":5,
+    "Q06":5,"Q07":5,"Q08":5,"Q09":5,"Q10":5,
+    "Q11":5,"Q12":5,"Q13":5,"Q14":5,"Q15":5,
+    "Q16":5,"Q17":5,"Q18":5,"Q19":5,"Q20":5
+  },
+  "overall": 100,
+  "hardGatesPass": true,
+  "notes": "Synthetic fixture only."
+}
