@@ -31,7 +31,31 @@
     "target": {"type": "object","additionalProperties": false,"required": ["audience","sessions","minutesPerSession"],"properties": {"audience": {"type": "string"},"sessions": {"type": "integer","minimum": 1},"minutesPerSession": {"type": "integer","minimum": 1}}},
     "sourceLock": {"type": "object","additionalProperties": false,"required": ["packageSha256","prototypePptxSha256","runtimeHtmlSha256","stateRunnerSha256","runtimeQaSha256"],"properties": {"packageSha256": {"type": "string","pattern": "^[0-9a-f]{64}$"},"prototypePptxSha256": {"type": "string","pattern": "^[0-9a-f]{64}$"},"runtimeHtmlSha256": {"type": "string","pattern": "^[0-9a-f]{64}$"},"stateRunnerSha256": {"type": "string","pattern": "^[0-9a-f]{64}$"},"runtimeQaSha256": {"type": "string","pattern": "^[0-9a-f]{64}$"}}},
     "goldenFixture": {"type": "string","pattern": "^fixtures/golden/.+\\.json$"},
-    "quality": {"type": "object","additionalProperties": false,"required": ["status","overall","domains"],"properties": {"status": {"enum": ["NOT_SCORED","SCORED"]},"overall": {"type": ["number","null"],"minimum": 0,"maximum": 100},"domains": {"type": "object"}}},
+    "design": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourcePolicy", "courseMap", "storyboardDir", "qualityRubric"],
+      "properties": {
+        "sourcePolicy": {"type": "string", "minLength": 1},
+        "courseMap": {"type": "string", "minLength": 1},
+        "storyboardDir": {"type": "string", "minLength": 1},
+        "qualityRubric": {"type": "string", "minLength": 1},
+        "qualityScore": {"type": "string", "minLength": 1}
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status","overall","domains"],
+      "properties": {
+        "status": {"enum": ["NOT_SCORED","SCORED"]},
+        "overall": {"type": ["number","null"],"minimum": 0,"maximum": 100},
+        "domains": {"type": "object"},
+        "rubricVersion": {"type": "string"},
+        "hardGatesPass": {"type": "boolean"},
+        "criteria": {"type": "object"}
+      }
+    },
     "rights": {"type": "object","additionalProperties": false,"required": ["status","publicRepositoryApproved","publicDistributionApproved"],"properties": {"status": {"enum": ["UNVERIFIED","VERIFIED"]},"publicRepositoryApproved": {"type": "boolean"},"publicDistributionApproved": {"type": "boolean"}}},
     "manualGates": {"type": "array","minItems": 1,"items": {"type": "object","additionalProperties": false,"required": ["id","status","invalidateOn"],"properties": {"id": {"type": "string"},"status": {"enum": ["PENDING","PASS","FAIL","STALE"]},"invalidateOn": {"type": "array","items": {"type": "string"}}}}},
     "ssot": {"type": "object","additionalProperties": false,"required": ["notionUrl","syncStatus","observedAt"],"properties": {"notionUrl": {"type": "string"},"syncStatus": {"enum": ["SYNCED","STALE_METADATA","CONFLICT"]},"observedAt": {"type": "string"},"note": {"type": "string"}}}
