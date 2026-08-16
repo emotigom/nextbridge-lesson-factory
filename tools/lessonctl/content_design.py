@@ -12,9 +12,10 @@ SCHEMAS = {
     'map': ROOT / 'contracts' / 'course-map.schema.json',
     'storyboard': ROOT / 'contracts' / 'storyboard.schema.json',
     'quality': ROOT / 'contracts' / 'quality-rubric.schema.json',
+    'concept': ROOT / 'contracts' / 'concept-order.schema.json',
 }
 LANGUAGE_POLICY = ROOT / 'policies' / 'student-language.json'
-CONCEPT_POLICY = ROOT / 'policies' / 'concept-order.json'
+DEFAULT_CONCEPT_POLICY = ROOT / 'policies' / 'concept-order.json'
 QUALITY_POLICY = ROOT / 'policies' / 'quality-rubric.json'
 ACTION_ROLES = {'THINK', 'CHOOSE', 'TRY', 'TALK', 'CHECK'}
 
@@ -61,14 +62,29 @@ def validate_course_map(data):
     return _report('course_map', blockers, detail={'sessions': len(sessions)})
 
 
-def _concept_index():
-    policy = load_jsonish(CONCEPT_POLICY)
+def validate_concept_policy(data):
+    blockers = [f'SCHEMA:{e}' for e in _schema_errors(data, 'concept')]
+    ids = []
+    labels = []
+    for term in data.get('terms', []):
+        if not isinstance(term, dict):
+            continue
+        ids.append(term.get('id'))
+        labels.extend(term.get('labels', []))
+    if len(ids) != len(set(ids)):
+        blockers.append('DUPLICATE_CONCEPT_ID')
+    if len(labels) != len(set(labels)):
+        blockers.append('DUPLICATE_CONCEPT_LABEL')
+    return _report('concept_policy', blockers, detail={'protectedTerms': len(ids)})
+
+
+def _concept_index(policy):
     index = {}
     for term in policy.get('terms', []):
         term_id = term['id']
         for label in term.get('labels', []):
             index[label] = term_id
-    return policy, index
+    return index
 
 
 def _normalized_introductions(values, concept_index):
@@ -82,11 +98,12 @@ def _normalized_introductions(values, concept_index):
     return ids
 
 
-def validate_storyboard(data):
+def validate_storyboard(data, concept_policy=None):
     blockers = [f'SCHEMA:{e}' for e in _schema_errors(data, 'storyboard')]
     warnings = []
     language = load_jsonish(LANGUAGE_POLICY)
-    concept_policy, concept_index = _concept_index()
+    concept_policy = concept_policy or load_jsonish(DEFAULT_CONCEPT_POLICY)
+    concept_index = _concept_index(concept_policy)
     slides = data.get('slides', [])
     beats = data.get('teachingBeats', [])
     beat_ids = {x.get('beat') for x in beats if isinstance(x, dict)}
@@ -211,34 +228,47 @@ def check_bundle(bundle_dir: Path):
     reports = []
     source_path = bundle_dir / 'source-policy.json'
     map_path = bundle_dir / 'course-map.json'
+    concept_path = bundle_dir / 'concept-policy.json'
     storyboard_dir = bundle_dir / 'storyboards'
     quality_path = bundle_dir / 'quality-score.json'
 
-    for required in (source_path, map_path):
+    required_files = (source_path, map_path, concept_path, quality_path)
+    for required in required_files:
         if not required.is_file():
             reports.append(_report(required.name, [f'MISSING_REQUIRED_FILE:{required.name}']))
+    if not storyboard_dir.is_dir():
+        reports.append(_report('storyboards', ['MISSING_REQUIRED_DIR:storyboards']))
     if reports:
-        return {'schemaVersion': '1.0.0', 'status': 'FAIL', 'bundle': str(bundle_dir), 'reports': reports}
+        blockers = [b for report in reports for b in report.get('blockers', [])]
+        return {'schemaVersion': '1.0.0', 'status': 'FAIL', 'bundle': str(bundle_dir), 'reports': reports, 'blockers': blockers, 'warnings': []}
 
     source = load_jsonish(source_path)
     course_map = load_jsonish(map_path)
-    reports.extend([validate_source_policy(source), validate_course_map(course_map)])
+    concept_policy = load_jsonish(concept_path)
+    quality = load_jsonish(quality_path)
+    reports.extend([
+        validate_source_policy(source),
+        validate_course_map(course_map),
+        validate_concept_policy(concept_policy),
+        validate_quality_score(quality),
+    ])
+
+    course_id = course_map.get('courseId')
+    if quality.get('courseId') != course_id:
+        reports.append(_report('course_id_consistency', ['QUALITY_COURSE_ID_MISMATCH']))
 
     map_sessions = [x.get('session') for x in course_map.get('sessions', [])]
-    storyboards = []
-    if storyboard_dir.is_dir():
-        for p in sorted(storyboard_dir.glob('session-*.json')):
-            storyboards.append((p, load_jsonish(p)))
+    storyboards = [(p, load_jsonish(p)) for p in storyboard_dir.glob('session-*.json')]
+    storyboards.sort(key=lambda item: (item[1].get('session', 10**9), item[0].name))
     storyboard_sessions = [x.get('session') for _, x in storyboards]
     if storyboard_sessions != map_sessions:
         reports.append(_report('storyboard_inventory', ['STORYBOARD_SESSION_SET_MISMATCH'], detail={'map': map_sessions, 'storyboards': storyboard_sessions}))
     for path, storyboard in storyboards:
-        rep = validate_storyboard(storyboard)
+        if storyboard.get('courseId') != course_id:
+            reports.append(_report('course_id_consistency', [f'STORYBOARD_COURSE_ID_MISMATCH:{path.name}']))
+        rep = validate_storyboard(storyboard, concept_policy)
         rep['path'] = str(path.relative_to(bundle_dir))
         reports.append(rep)
-
-    if quality_path.is_file():
-        reports.append(validate_quality_score(load_jsonish(quality_path)))
 
     blockers = [b for report in reports for b in report.get('blockers', [])]
     warnings = [w for report in reports for w in report.get('warnings', [])]
