@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nextbridge.example/contracts/clean-room-source.schema.json",
+  "title": "Nextbridge Clean-room Source Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "designMode", "allowedInputs", "priorArtifactPolicy", "copyPolicy"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "designMode": {"const": "clean-room"},
+    "allowedInputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "label", "permission"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "kind": {"enum": ["requirements", "design-rules", "course-map", "reference", "fact-source"]},
+          "label": {"type": "string", "minLength": 1},
+          "permission": {"enum": ["read-content", "structure-only", "facts-only"]},
+          "notes": {"type": "string"}
+        }
+      }
+    },
+    "priorArtifactPolicy": {"const": "deny-unless-explicitly-approved"},
+    "copyPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["copyPriorWording", "copyPriorLayout", "copyPriorActivities", "copyPriorVisualSystem"],
+      "properties": {
+        "copyPriorWording": {"const": false},
+        "copyPriorLayout": {"const": false},
+        "copyPriorActivities": {"const": false},
+        "copyPriorVisualSystem": {"const": false}
+      }
+    },
+    "explicitlyApprovedReferences": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    }
+  }
+}

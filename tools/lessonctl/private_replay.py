@@ -5,6 +5,7 @@ from core import ROOT, QAError, load_jsonish, sha256, html_qa
 from pptx_checks import pptx_qa
 from package_checks import verify_inventory, html_runtime_contract, runtime_report_contract, manifest_contract
 
+
 def verify_private_package(course,zip_path:Path):
     out={'provided':True,'packageSha256':sha256(zip_path),'checks':[]}
     if out['packageSha256']!=course['sourceLock']['packageSha256']: raise QAError('private package SHA mismatch')
@@ -31,6 +32,12 @@ def verify_private_package(course,zip_path:Path):
         inventory=verify_inventory(base,manifest_path,checksum_files[0])
         out['checks'].append({'name':'manifest_assets','status':'PASS',**inventory})
         golden=load_jsonish(ROOT/course['goldenFixture'])
+        expected=golden.get('expected',{})
+        prototype_expected=expected.get('prototype',{})
+        expected_slides=int(prototype_expected.get('slides',0) or 0)
+        expected_notes=int(prototype_expected.get('notes',0) or 0)
+        if expected_slides < 1 or expected_notes < 1:
+            raise QAError('golden prototype slide/note expectation missing')
         contract=manifest_contract(manifest,golden,load_jsonish(ROOT/'config/budget-policy.json'))
         out['checks'].append({'name':'package_manifest_contract','status':'PASS',**contract})
         validators=sorted(base.glob('validate_package*.mjs'))
@@ -53,25 +60,26 @@ def verify_private_package(course,zip_path:Path):
         if ppt_asset:
             pq=pptx_qa(base/ppt_asset['file']); out['pptx']=pq
             if not pq['pass']: raise QAError('PPTX structural gate failed')
-            if pq['slides']!=5 or pq['notes']!=5: raise QAError('golden prototype slide/note count mismatch')
+            if pq['slides']!=expected_slides or pq['notes']!=expected_notes:
+                raise QAError('golden prototype slide/note count mismatch')
         if ppt_asset and ppt_qa_asset:
             qj=load_jsonish(base/ppt_qa_asset['file'])
-            if qj.get('sha256')!=ppt_asset['sha256'] or qj.get('slideCount')!=5 or qj.get('passed') is not True or qj.get('failures'):
+            if qj.get('sha256')!=ppt_asset['sha256'] or qj.get('slideCount')!=expected_slides or qj.get('passed') is not True or qj.get('failures'):
                 raise QAError('prototype QA report cross-contract failed')
             if not qj.get('checks') or not all(v is True for v in qj['checks'].values()): raise QAError('prototype QA checks not all true')
             out['checks'].append({'name':'prototype_qa_cross_contract','status':'PASS','checkCount':len(qj['checks'])})
         if ppt_asset and render_asset:
-            rj=load_jsonish(base/render_asset['file']); ge=load_jsonish(ROOT/course['goldenFixture'])['expected']['prototype']
+            rj=load_jsonish(base/render_asset['file']); ge=prototype_expected
             ar=rj.get('artifactRender',{}); st=rj.get('slidesTest',{})
             pages=ar.get('pages',[])
             if rj.get('subjectSha256')!=ppt_asset['sha256']: raise QAError('render evidence subject SHA mismatch')
             if rj.get('baselineSha256')!=ge.get('baselinePptxSha256'): raise QAError('render evidence baseline SHA mismatch')
-            if ar.get('pageCount')!=5 or len(pages)!=5 or not all(x.get('pixelEqual') is True for x in pages): raise QAError('pixel regression evidence failed')
+            if ar.get('pageCount')!=expected_slides or len(pages)!=expected_slides or not all(x.get('pixelEqual') is True for x in pages): raise QAError('pixel regression evidence failed')
             if st.get('status')!='PASS' or st.get('overflowCount')!=0: raise QAError('overflow evidence failed')
             if preview_asset and rj.get('preview',{}).get('sha256')!=preview_asset['sha256']: raise QAError('preview evidence SHA mismatch')
             out['checks'].append({'name':'prototype_render_evidence','status':'PASS','pixelEqualPages':len(pages),'overflow':0,'fontApproval':False})
         if html_asset and report_asset:
-            rc=runtime_report_contract(base/report_asset['file'],html_asset,manifest,golden['expected'])
+            rc=runtime_report_contract(base/report_asset['file'],html_asset,manifest,expected)
             out['checks'].append({'name':'runtime_report_contract','status':'PASS',**rc})
         if runner_asset and html_asset and report_asset:
             cp=subprocess.run(['node',runner_asset['file'],html_asset['file'],report_asset['file']],cwd=base,text=True,capture_output=True,env={**os.environ,'SOURCE_DATE_EPOCH':'0'})

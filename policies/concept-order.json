@@ -1,0 +1,6 @@
+{
+  "schemaVersion": "1.0.0",
+  "introduceAfterExperience": true,
+  "terms": [],
+  "notes": "Factory-wide default. Each design bundle may provide concept-policy.json with course-specific protected terms. Teacher notes may use preparation terminology earlier; the order gate applies to studentText."
+}

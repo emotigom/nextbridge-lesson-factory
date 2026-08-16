@@ -6,6 +6,28 @@
 
 `HOLD`는 단계가 아니라 출시 판정이다. 활성 WIP는 정확히 1개이며 `FIELD_READY` 이상 전에는 다음 교안을 활성화하지 않는다.
 
+## CONTENT_QA 앞단의 교육 설계 Gate
+
+PPTX/HTML 생성 전에는 별도의 content-design bundle을 먼저 검증한다.
+
+```bash
+python3 tools/lessonctl/content_design.py check --path <design-bundle>
+```
+
+검사 범위:
+
+- clean-room 허용 입력과 과거 산출물 복사 금지
+- 전체 차시 지도 잠금과 차시별 승인 상태
+- 차시 storyboard 승인 상태
+- 첫 학생 행동 3분 이내
+- CORE/BUFFER 시간 계약
+- BUFFER의 필수 새 개념 도입 금지
+- 학생 화면의 내부 QA/보고체 금지 문구
+- 보호 개념의 경험 전 선노출 금지
+- 20항목·100점 quality score 및 7개 필수 항목
+
+슬라이드 18~22장, Teaching Beat 6~8개는 목표값이며 교육 흐름을 억지로 맞추지 않도록 warning으로 둔다. 이 PR에서는 기존 release lifecycle을 깨지 않기 위해 현재 `feed-why` manifest에 아직 설계 bundle을 강제 연결하지 않는다. 실제 course migration과 stage wiring은 별도 변경으로 수행한다.
+
 ## RELEASE_APPROVED 필수 조건
 
 `lessonctl release verify --require-approved`는 아래를 **모두** 검사하고 하나라도 빠지면 non-zero로 중단한다.
@@ -34,24 +56,39 @@
 
 ## 자동 Gate — 현재 구현
 
+### 교육 설계
+
+- clean-room source policy schema와 복사 금지
+- course map 잠금/승인/연속 차시 번호
+- storyboard schema와 차시 inventory
+- 첫 학생 행동 3분 이내
+- CORE/full timing tolerance
+- BUFFER skippable 및 새 필수 개념 금지
+- studentText 전용 금지/경고 문구
+- 보호 개념의 `conceptsIntroduced` 이전 studentText 노출 차단
+- LEARN 3장 이상 연속 hard fail, 2장 연속 warning
+- 20항목 quality score 재계산과 hard-gate 최소점 확인
+
+### 패키지·런타임
+
 - source SHA/golden contract/WIP=1
 - public repo의 금지 바이너리·기본 PII·secret-like literal scan
 - ZIP CRC, duplicate path, path traversal, Unicode normalization collision, hidden path
 - package root inventory = manifest assets + manifest + checksum file exactly; no missing/no extras
 - `CHECKSUMS_SHA256` inventory와 manifest SHA/size의 독립 Python 교차검증
-- package manifest stage/release/cost policy/15개 필수 asset role 계약
+- package manifest stage/release/cost policy/필수 asset role 계약
 - HTML app/build/schema/dataset/original-source SHA와 필수 UI control/sessionStorage/import-export/print 계약
-- packaged runtime QA report 34개 전부 true, 필수 안전 check 13개, supported matrix 108건 계약
+- packaged runtime QA report와 supported matrix 계약
 - XML/SVG/RELS/Content Types parse와 내부 relationship target
 - PPTX slide/note count, hidden/orphan, placeholder text, external relationship inventory
 - DrawingML exponent/비정상 shadow 수치, slide bounds 밖 shape 후보
 - 폰트 참조·임베딩 여부·언어 태그 inventory
-- 발표자 노트 10개 필수 구역
-- private v0.4 manifest asset 1:1 size/SHA
-- prototype QA report subject SHA/8개 check cross-contract
-- 5장 render evidence pixel 5/5 동일, overflow 0, preview SHA cross-contract
+- 발표자 노트 필수 구역
+- private locked manifest asset 1:1 size/SHA
+- prototype QA report subject SHA/check cross-contract
+- render evidence의 기대 page 수·pixel regression·overflow·preview SHA를 golden contract 기준으로 교차검증
 - HTML 외부 ref/network API/기본 PII scan
-- runtime 상태전이 34/34와 report SHA 결정성
+- runtime 상태전이와 report SHA 결정성
 - release manifest asset size/SHA와 immutable R2 key
 - 결정적 ZIP 2회 SHA 동일성
 - PR change impact → Fast 또는 Full public QA 선택

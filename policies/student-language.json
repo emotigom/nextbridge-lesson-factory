@@ -1,0 +1,32 @@
+{
+  "policyVersion": "1.0.0",
+  "scope": "studentText",
+  "forbiddenPhrases": [
+    "본 활동은",
+    "다음 결과를 통해",
+    "파일럿",
+    "QA",
+    "테스트 케이스",
+    "경계값 검증",
+    "동일 입력",
+    "SSOT",
+    "Gate",
+    "SHA",
+    "실행 결과 보고",
+    "확인했습니다",
+    "적용했습니다",
+    "검증했습니다"
+  ],
+  "warningPhrases": [
+    "확인할 수 있습니다",
+    "알아보겠습니다",
+    "살펴보겠습니다",
+    "본 슬라이드",
+    "본 차시"
+  ],
+  "heuristics": {
+    "maxCharactersPerStudentText": 180,
+    "warnWhenNoActionOrQuestion": true,
+    "actionEndings": ["보세요", "골라보세요", "바꿔보세요", "비교해보세요", "예상해보세요", "말해보세요", "적어보세요", "찾아보세요", "까요?", "나요?", "일까요?"]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "designMode": "clean-room",
+  "allowedInputs": [
+    {"id":"requirements","kind":"requirements","label":"synthetic requirements","permission":"read-content"},
+    {"id":"rules","kind":"design-rules","label":"synthetic design rules","permission":"read-content"},
+    {"id":"map","kind":"course-map","label":"synthetic course map","permission":"read-content"}
+  ],
+  "priorArtifactPolicy": "deny-unless-explicitly-approved",
+  "copyPolicy": {
+    "copyPriorWording": false,
+    "copyPriorLayout": false,
+    "copyPriorActivities": false,
+    "copyPriorVisualSystem": false
+  },
+  "explicitlyApprovedReferences": []
+}

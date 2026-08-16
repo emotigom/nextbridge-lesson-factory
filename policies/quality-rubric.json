@@ -1,0 +1,28 @@
+{
+  "rubricVersion": "1.0.0",
+  "scale": {"min": 0, "max": 5},
+  "releaseThresholds": {"fieldReadyOverall": 90, "canonicalOverall": 95, "canonicalHardGateMinimum": 4},
+  "criteria": [
+    {"id":"Q01","domain":"instructional-design","label":"핵심 질문 선명성","weight":5,"hardGate":true},
+    {"id":"Q02","domain":"instructional-design","label":"경험 중심 흐름","weight":5,"hardGate":false},
+    {"id":"Q03","domain":"instructional-design","label":"차시별 역할 분리","weight":5,"hardGate":false},
+    {"id":"Q04","domain":"instructional-design","label":"활동·산출물 정합성","weight":5,"hardGate":false},
+    {"id":"Q05","domain":"student-screen","label":"한 장 한 가지 행동","weight":5,"hardGate":true},
+    {"id":"Q06","domain":"student-screen","label":"학생 문장 품질","weight":5,"hardGate":false},
+    {"id":"Q07","domain":"student-screen","label":"정보량·인지부하","weight":5,"hardGate":false},
+    {"id":"Q08","domain":"student-screen","label":"정답 선공개·보고체 제거","weight":5,"hardGate":true},
+    {"id":"Q09","domain":"participation","label":"수업 초반 진입성","weight":5,"hardGate":false},
+    {"id":"Q10","domain":"participation","label":"실제 조작·비교","weight":5,"hardGate":true},
+    {"id":"Q11","domain":"participation","label":"활동 후 회수","weight":5,"hardGate":false},
+    {"id":"Q12","domain":"concept-learning","label":"개념 도입 순서","weight":5,"hardGate":true},
+    {"id":"Q13","domain":"concept-learning","label":"개념 정확성","weight":5,"hardGate":false},
+    {"id":"Q14","domain":"concept-learning","label":"차시 누적 구조","weight":5,"hardGate":false},
+    {"id":"Q15","domain":"instructor-operation","label":"강사 운용성","weight":5,"hardGate":true},
+    {"id":"Q16","domain":"instructor-operation","label":"실제 수업시간 현실성","weight":5,"hardGate":false},
+    {"id":"Q17","domain":"instructor-operation","label":"CORE/BUFFER 설계","weight":5,"hardGate":false},
+    {"id":"Q18","domain":"visual-design","label":"시각적 위계·가독성","weight":5,"hardGate":false},
+    {"id":"Q19","domain":"visual-design","label":"일관성과 장면 변화","weight":5,"hardGate":false},
+    {"id":"Q20","domain":"field-reproducibility","label":"학교 현장 안정성","weight":5,"hardGate":true}
+  ],
+  "hardGateMinimum": 3
+}
