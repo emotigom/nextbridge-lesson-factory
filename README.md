@@ -34,9 +34,33 @@ python3 tools/lessonctl/content_design.py check \
 
 이 검사는 clean-room 입력 정책, 차시 지도 잠금, 첫 학생 행동 시점, CORE/BUFFER 시간, 학생 화면의 내부 QA/보고체 문구, 교안별 보호 개념의 경험 전 노출, 100점 rubric 합계와 필수 항목을 검사합니다. 슬라이드 수 18~22장과 Teaching Beat 6~8개는 교육 흐름을 망치지 않도록 hard fail이 아니라 warning입니다.
 
+## ChatGPT 대화 → Factory handoff
+
+ChatGPT 대화 전문을 Factory에 저장하지 않습니다. **사람이 승인한 설계 결정만 `handoff.json`으로 구조화**하고, 상세 handoff는 private/local에서만 다룹니다.
+
+중간 단계의 handoff도 검증할 수 있습니다.
+
+```bash
+python3 tools/lessonctl/handoff.py validate \
+  --file /private-work/course/handoff.json
+```
+
+`SESSION_N_APPROVED` 같은 중간 상태는 보존할 수 있지만, Factory design bundle 생성은 `ALL_CONTENT_APPROVED` 이후에만 허용됩니다.
+
+```bash
+python3 tools/lessonctl/handoff.py materialize \
+  --file /private-work/course/handoff.json \
+  --out /private-work/course/design-bundle
+```
+
+`materialize`는 승인된 handoff를 기존 `source-policy / course-map / concept-policy / storyboard / quality-score` 구조로 변환한 뒤 `content_design.py` 검사를 다시 통과시킵니다. 대화방에 붙여넣을 요청문은 `templates/chatgpt/handoff-request.md`를 사용합니다.
+
+public Git에는 실제 handoff를 커밋하지 않습니다. 이 저장소에는 스키마, 도구, synthetic handoff fixture만 둡니다.
+
 ## 빠른 실행
 
 ```bash
+python3 tools/lessonctl/handoff.py validate --file fixtures/handoff/chatgpt-pass/handoff.json
 python3 tools/lessonctl/content_design.py check --path fixtures/design/clean-room-pass
 python3 tools/lessonctl/lessonctl.py intake courses/feed-why/course.yaml
 python3 tools/lessonctl/lessonctl.py qa fast --course feed-why --json out/gate-report.json
@@ -57,7 +81,7 @@ python3 tools/lessonctl/lessonctl.py qa full \
 
 ## 공개/비공개 경계
 
-활성 교안의 실제 ZIP/PPTX/HTML과 학교 원본은 공개 저장소에 커밋하지 않습니다. 이 저장소에는 검증된 SHA, 기대 결과 계약, 공개 가능한 정책·스키마, synthetic fixture만 둡니다. 자세한 결정은 `docs/decisions/0001-lesson-factory-architecture.md`와 `docs/decisions/0002-content-design-contracts.md`를 참고하세요.
+활성 교안의 실제 ZIP/PPTX/HTML과 학교 원본, 실제 ChatGPT handoff는 공개 저장소에 커밋하지 않습니다. 이 저장소에는 검증된 SHA, 기대 결과 계약, 공개 가능한 정책·스키마, synthetic fixture만 둡니다. 자세한 결정은 `docs/decisions/0001-lesson-factory-architecture.md`와 `docs/decisions/0002-content-design-contracts.md`를 참고하세요.
 
 ## R2 / Cloudflare 안전 경계
 
