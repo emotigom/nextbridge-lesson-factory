@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nextbridge.example/contracts/concept-order.schema.json",
+  "title": "Nextbridge Concept Order Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "introduceAfterExperience", "terms"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "introduceAfterExperience": {"type": "boolean"},
+    "terms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "labels"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "labels": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
+    "notes": {"type": "string"}
+  }
+}
