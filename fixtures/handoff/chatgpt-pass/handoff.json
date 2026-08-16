@@ -4,14 +4,9 @@
   "courseId": "synthetic-course",
   "title": "Synthetic clean-room lesson",
   "designState": "ALL_CONTENT_APPROVED",
-  "privateConversationEvidence": {
-    "detailPublished": false,
-    "conversationRef": null,
-    "conversationDigestSha256": null
-  },
+  "privateConversationEvidence": {"detailPublished": false,"conversationRef": null,"conversationDigestSha256": null},
   "sourcePolicy": {
-    "schemaVersion": "1.0.0",
-    "designMode": "clean-room",
+    "schemaVersion": "1.0.0","designMode": "clean-room",
     "allowedInputs": [
       {"id":"requirements","kind":"requirements","label":"synthetic requirements","permission":"read-content"},
       {"id":"rules","kind":"design-rules","label":"synthetic design rules","permission":"read-content"},
@@ -22,28 +17,15 @@
     "explicitlyApprovedReferences": []
   },
   "courseMap": {
-    "schemaVersion": "1.0.0",
-    "courseId": "synthetic-course",
-    "locked": true,
-    "flow": ["경험","비교","개념","적용"],
-    "sessions": [
-      {"session":1,"question":"무엇이 달라졌을까요?","coreExperience":"같은 후보를 다른 기준으로 비교한다.","minimumOutput":"변경 전·후 비교 카드","status":"APPROVED"}
-    ]
+    "schemaVersion":"1.0.0","courseId":"synthetic-course","locked":true,"flow":["경험","비교","개념","적용"],
+    "sessions":[{"session":1,"question":"무엇이 달라졌을까요?","coreExperience":"같은 후보를 다른 기준으로 비교한다.","minimumOutput":"변경 전·후 비교 카드","status":"APPROVED"}]
   },
-  "conceptPolicy": {
-    "schemaVersion": "1.0.0",
-    "introduceAfterExperience": true,
-    "terms": [{"id":"weight","labels":["가중치"]}],
-    "notes": "Synthetic course-specific protected term."
-  },
+  "conceptPolicy": {"schemaVersion":"1.0.0","introduceAfterExperience":true,"terms":[{"id":"weight","labels":["가중치"]}],"notes":"Synthetic course-specific protected term."},
   "storyboards": [
     {
       "schemaVersion":"1.0.0","courseId":"synthetic-course","session":1,"status":"APPROVED",
       "timing":{"coreTargetMinutes":45,"fullTargetMinutes":50,"coreToleranceMinutes":0.1},
-      "teachingBeats":[
-        {"beat":1,"title":"질문"},{"beat":2,"title":"첫 선택"},{"beat":3,"title":"직접 비교"},
-        {"beat":4,"title":"차이 설명"},{"beat":5,"title":"경험에 이름 붙이기"},{"beat":6,"title":"다시 적용"}
-      ],
+      "teachingBeats":[{"beat":1,"title":"질문"},{"beat":2,"title":"첫 선택"},{"beat":3,"title":"직접 비교"},{"beat":4,"title":"차이 설명"},{"beat":5,"title":"경험에 이름 붙이기"},{"beat":6,"title":"다시 적용"}],
       "slides":[
         {"slide":1,"teachingBeat":1,"priority":"CORE","role":"LOOK","title":"무엇이 달라질까?","studentText":"같은 후보인데 결과가 달라질 수 있을까요?","visual":"후보 카드 세 장","studentAction":"오늘의 질문을 확인한다.","teacherScript":"정답을 설명하지 않고 오늘 확인할 질문만 제시한다.","expectedResponses":[],"stuckPrompt":"아직 예상하지 않아도 됩니다.","transition":"먼저 하나를 골라봅니다.","minutes":0.5,"skippable":false,"conceptsIntroduced":[]},
         {"slide":2,"teachingBeat":2,"priority":"CORE","role":"CHOOSE","title":"하나를 골라보세요","studentText":"지금이라면 무엇을 먼저 보여주겠나요?","visual":"후보 카드 세 장","studentAction":"후보 하나를 고른다.","teacherScript":"학생마다 선택이 달라도 그대로 둔다.","expectedResponses":["A","B","C"],"stuckPrompt":"느낌대로 하나만 골라보세요.","transition":"이번에는 기준을 하나 정해봅니다.","minutes":4.5,"skippable":false,"conceptsIntroduced":[]},
@@ -55,14 +37,11 @@
       ]
     }
   ],
-  "qualityScore": {
-    "schemaVersion":"1.0.0","rubricVersion":"1.0.0","courseId":"synthetic-course","reviewer":"fixture-reviewer",
-    "criteria":{"Q01":5,"Q02":5,"Q03":5,"Q04":5,"Q05":5,"Q06":5,"Q07":5,"Q08":5,"Q09":5,"Q10":5,"Q11":5,"Q12":5,"Q13":5,"Q14":5,"Q15":5,"Q16":5,"Q17":5,"Q18":5,"Q19":5,"Q20":5},
-    "overall":100,"hardGatesPass":true,"notes":"Synthetic fixture only."
-  },
+  "qualityScore": {"schemaVersion":"1.0.0","rubricVersion":"1.0.0","courseId":"synthetic-course","reviewer":"fixture-reviewer","criteria":{"Q01":5,"Q02":5,"Q03":5,"Q04":5,"Q05":5,"Q06":5,"Q07":5,"Q08":5,"Q09":5,"Q10":5,"Q11":5,"Q12":5,"Q13":5,"Q14":5,"Q15":5,"Q16":5,"Q17":5,"Q18":5,"Q19":5,"Q20":5},"overall":100,"hardGatesPass":true,"notes":"Synthetic fixture only."},
   "approvals": {
-    "courseMap":{"status":"APPROVED","reviewer":"fixture-reviewer","approvedAt":"2026-08-16T00:00:00Z"},
-    "sessions":[{"session":1,"status":"APPROVED","reviewer":"fixture-reviewer","approvedAt":"2026-08-16T00:01:00Z"}],
-    "allContent":{"status":"APPROVED","reviewer":"fixture-reviewer","approvedAt":"2026-08-16T00:02:00Z"}
+    "cleanIntake":{"status":"APPROVED","reviewer":"fixture-reviewer","approvedAt":"2026-08-16T00:00:00Z"},
+    "courseMap":{"status":"APPROVED","reviewer":"fixture-reviewer","approvedAt":"2026-08-16T00:01:00Z"},
+    "sessions":[{"session":1,"status":"APPROVED","reviewer":"fixture-reviewer","approvedAt":"2026-08-16T00:02:00Z"}],
+    "allContent":{"status":"APPROVED","reviewer":"fixture-reviewer","approvedAt":"2026-08-16T00:03:00Z"}
   }
 }
