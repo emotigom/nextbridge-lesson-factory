@@ -75,8 +75,11 @@ def validate_handoff(handoff):
     sessions = handoff['courseMap'].get('sessions', [])
     session_numbers = [x.get('session') for x in sessions if isinstance(x, dict)]
     approvals = handoff['approvals']
+    blockers.extend(_metadata_blockers('cleanIntake', approvals.get('cleanIntake')))
     blockers.extend(_metadata_blockers('courseMap', approvals.get('courseMap')))
     blockers.extend(_metadata_blockers('allContent', approvals.get('allContent')))
+    if not _approved(approvals.get('cleanIntake')):
+        blockers.append('CLEAN_INTAKE_NOT_APPROVED')
     if not _approved(approvals.get('courseMap')):
         blockers.append('COURSE_MAP_NOT_APPROVED')
 
