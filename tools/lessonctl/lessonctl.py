@@ -9,6 +9,7 @@ from release_policy import verify_manifest, budget_guard, deterministic_zip, r2_
 from pptx_checks import pptx_qa
 from evidence import evidence_subject, evidence_plan, scaffold_evidence, stage_check, verify_evidence
 from dashboard import build_dashboard, verify_dashboard
+from design_proof import verify_path as verify_design_proof_path
 
 def qa(course_id,mode,private_package=None):
     cp=course_path(course_id); course=load_jsonish(cp); checks=[]; failures=[]; blockers=[]
@@ -21,6 +22,19 @@ def qa(course_id,mode,private_package=None):
     if not ok: failures.append(detail)
     ok,detail=verify_dashboard(course); checks.append({'name':'dashboard_contract','status':'PASS' if ok else 'FAIL','detail':detail});
     if not ok: failures.append(detail)
+
+    design_proof=None
+    design=course.get('design')
+    if design:
+        proof_path=ROOT/design['proof']
+        if not proof_path.is_file():
+            failures.append('design proof missing: '+design['proof'])
+            checks.append({'name':'design_proof','status':'FAIL','detail':'missing '+design['proof']})
+        else:
+            design_proof=verify_design_proof_path(proof_path,course_id)
+            checks.append({'name':'design_proof','status':design_proof['status'],'detail':design_proof})
+            if design_proof['status']!='PASS': failures+=design_proof['blockers']
+
     if course['ssot']['syncStatus']!='SYNCED': blockers.append('SSOT_'+course['ssot']['syncStatus'])
     if course['quality']['status']!='SCORED' or course['quality']['overall'] is None: blockers.append('QUALITY_NOT_SCORED')
     if course['rights']['status']!='VERIFIED': blockers.append('RIGHTS_UNVERIFIED')
@@ -29,13 +43,13 @@ def qa(course_id,mode,private_package=None):
     private=None
     if private_package:
         try:
-            private=verify_private_package(course,Path(private_package)); checks.append({'name':'private_golden_replay','status':'PASS','detail':'actual v0.4 package replayed'})
+            private=verify_private_package(course,Path(private_package)); checks.append({'name':'private_golden_replay','status':'PASS','detail':'legacy runtime package replayed against current source lock'})
         except Exception as e:
             failures.append(str(e)); checks.append({'name':'private_golden_replay','status':'FAIL','detail':str(e)})
     elif mode=='full':
-        checks.append({'name':'private_golden_replay','status':'SKIPPED_POLICY','detail':'actual rights-unverified binary is intentionally absent from public Git; run locally/private CI with --private-package'})
+        checks.append({'name':'private_golden_replay','status':'SKIPPED_POLICY','detail':'actual rights-unverified runtime binary is intentionally absent from public Git; run locally/private CI with --private-package'})
         blockers.append('PRIVATE_SOURCE_REPLAY_NOT_RUN_IN_PUBLIC_CI')
-    return {'schemaVersion':'1.0.0','courseId':course_id,'mode':mode,'status':'FAIL' if failures else 'PASS','releaseDecision':course['releaseDecision'],'stage':course['stage'],'subject':course['sourceLock'],'checks':checks,'promotionBlockers':sorted(set(blockers)),'manualGates':course['manualGates'],'privateReplay':private,'failures':failures}
+    return {'schemaVersion':'1.0.0','courseId':course_id,'mode':mode,'status':'FAIL' if failures else 'PASS','releaseDecision':course['releaseDecision'],'stage':course['stage'],'subject':course['sourceLock'],'checks':checks,'promotionBlockers':sorted(set(blockers)),'manualGates':course['manualGates'],'designProof':design_proof,'privateReplay':private,'failures':failures}
 
 def impact(base,head):
     cp=subprocess.run(['git','diff','--name-only',base,head],cwd=ROOT,text=True,capture_output=True)
