@@ -29,8 +29,9 @@
     "approvals": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["courseMap","sessions","allContent"],
+      "required": ["cleanIntake","courseMap","sessions","allContent"],
       "properties": {
+        "cleanIntake": {"$ref": "#/$defs/approval"},
         "courseMap": {"$ref": "#/$defs/approval"},
         "sessions": {
           "type": "array",
