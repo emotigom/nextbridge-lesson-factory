@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "1.0.0",
+  "introduceAfterExperience": true,
+  "terms": [
+    {"id":"weight","labels":["가중치"]}
+  ],
+  "notes": "Synthetic course-specific protected term."
+}
