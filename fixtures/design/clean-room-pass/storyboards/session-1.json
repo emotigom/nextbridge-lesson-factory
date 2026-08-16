@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "1.0.0",
+  "courseId": "synthetic-course",
+  "session": 1,
+  "status": "APPROVED",
+  "timing": {"coreTargetMinutes":45,"fullTargetMinutes":50,"coreToleranceMinutes":0.1},
+  "teachingBeats": [
+    {"beat":1,"title":"질문"},
+    {"beat":2,"title":"첫 선택"},
+    {"beat":3,"title":"직접 비교"},
+    {"beat":4,"title":"차이 설명"},
+    {"beat":5,"title":"경험에 이름 붙이기"},
+    {"beat":6,"title":"다시 적용"}
+  ],
+  "slides": [
+    {
+      "slide":1,"teachingBeat":1,"priority":"CORE","role":"LOOK","title":"무엇이 달라질까?",
+      "studentText":"같은 후보인데 결과가 달라질 수 있을까요?","visual":"후보 카드 세 장","studentAction":"오늘의 질문을 확인한다.",
+      "teacherScript":"정답을 설명하지 않고 오늘 확인할 질문만 제시한다.","expectedResponses":[],"stuckPrompt":"아직 예상하지 않아도 됩니다.","transition":"먼저 하나를 골라봅니다.","minutes":0.5,"skippable":false,"conceptsIntroduced":[]
+    },
+    {
+      "slide":2,"teachingBeat":2,"priority":"CORE","role":"CHOOSE","title":"하나를 골라보세요",
+      "studentText":"지금이라면 무엇을 먼저 보여주겠나요?","visual":"후보 카드 세 장","studentAction":"후보 하나를 고른다.",
+      "teacherScript":"학생마다 선택이 달라도 그대로 둔다.","expectedResponses":["A","B","C"],"stuckPrompt":"느낌대로 하나만 골라보세요.","transition":"이번에는 기준을 하나 정해봅니다.","minutes":4.5,"skippable":false,"conceptsIntroduced":[]
+    },
+    {
+      "slide":3,"teachingBeat":3,"priority":"CORE","role":"TRY","title":"기준 하나만 바꿔보세요",
+      "studentText":"기준 하나를 바꾸고 다시 순서를 정해보세요.","visual":"기준 카드와 후보 카드","studentAction":"기준을 바꾸고 후보 순서를 다시 놓는다.",
+      "teacherScript":"후보는 그대로 두고 기준 하나만 바꾸게 한다.","expectedResponses":["순서가 바뀌었다","그대로다"],"stuckPrompt":"처음 기준과 지금 기준만 비교해보세요.","transition":"두 결과를 나란히 봅니다.","minutes":12,"skippable":false,"conceptsIntroduced":[]
+    },
+    {
+      "slide":4,"teachingBeat":4,"priority":"CORE","role":"TALK","title":"왜 움직였나요?",
+      "studentText":"무엇을 바꿨더니 무엇이 달라졌나요?","visual":"BEFORE와 AFTER","studentAction":"변화를 한 문장으로 말한다.",
+      "teacherScript":"학생이 결과 변화의 원인을 자기 말로 설명하게 한다.","expectedResponses":["중요하게 본 기준이 달라졌다"],"stuckPrompt":"바꾼 것 하나와 움직인 것 하나만 말해보세요.","transition":"방금 바꾼 정도에 짧게 이름을 붙입니다.","minutes":8,"skippable":false,"conceptsIntroduced":[]
+    },
+    {
+      "slide":5,"teachingBeat":5,"priority":"CORE","role":"LEARN","title":"중요하게 보는 정도",
+      "studentText":"어떤 기준을 얼마나 중요하게 볼지 정한 정도를 가중치라고 부르기도 합니다.","visual":"중요도 막대","studentAction":"방금 활동과 새 용어를 연결한다.",
+      "teacherScript":"정의는 한 문장만 말하고 계산 설명으로 확장하지 않는다.","expectedResponses":["아까 바꾼 중요도"],"stuckPrompt":"가중치는 여기서 중요도라고 생각해도 됩니다.","transition":"이제 다시 직접 바꿔봅니다.","minutes":4,"skippable":false,"conceptsIntroduced":["weight"]
+    },
+    {
+      "slide":6,"teachingBeat":6,"priority":"CORE","role":"TRY","title":"내 기준으로 한 번 더",
+      "studentText":"가장 중요하게 볼 기준을 정하고 결과를 다시 만들어보세요.","visual":"빈 비교 카드","studentAction":"자기 기준을 적용해 결과를 만들고 기록한다.",
+      "teacherScript":"학생마다 결과가 달라도 이유를 설명할 수 있으면 인정한다.","expectedResponses":["기준에 따라 결과가 달라졌다"],"stuckPrompt":"가장 중요한 기준 하나부터 정하세요.","transition":"마지막으로 결과를 설명합니다.","minutes":16,"skippable":false,"conceptsIntroduced":[]
+    },
+    {
+      "slide":7,"teachingBeat":6,"priority":"BUFFER","role":"TALK","title":"친구와 비교해보세요",
+      "studentText":"친구와 결과가 다르다면 무엇을 다르게 중요하게 봤나요?","visual":"두 비교 카드","studentAction":"친구와 결과 이유를 비교한다.",
+      "teacherScript":"시간이 남을 때만 진행한다.","expectedResponses":["기준이 달랐다"],"stuckPrompt":"가장 높은 중요도부터 비교하세요.","transition":"수업을 마무리합니다.","minutes":5,"skippable":true,"conceptsIntroduced":[]
+    }
+  ]
+}
