@@ -51,6 +51,15 @@ class TestContentDesign(unittest.TestCase):
         self.assertIn('SESSION_NUMBERS_NOT_CONTIGUOUS', blockers)
         self.assertIn('COURSE_MAP_SESSION_NOT_APPROVED', blockers)
 
+    def test_guided_build_course_map_requires_concrete_practice_anchor(self):
+        course_map = copy.deepcopy(self.course_map)
+        course_map['deliveryProfile'] = 'guided-build'
+        report = validate_course_map(course_map)
+        self.assertIn('GUIDED_BUILD_PRACTICE_ANCHOR_MISSING', report['blockers'])
+        course_map['practiceAnchor'] = {'tool':'A-Frame','studentBuild':'브라우저에서 직접 움직이는 3D 월드'}
+        report = validate_course_map(course_map)
+        self.assertNotIn('GUIDED_BUILD_PRACTICE_ANCHOR_MISSING', report['blockers'])
+
     def test_concept_policy_rejects_duplicate_labels(self):
         concepts = copy.deepcopy(self.concepts)
         concepts['terms'].append({'id':'another','labels':['가중치']})
@@ -69,6 +78,19 @@ class TestContentDesign(unittest.TestCase):
         report = validate_storyboard(storyboard, self.concepts)
         self.assertIn('CONCEPT_BEFORE_INTRO:S2:가중치', report['blockers'])
 
+    def test_guided_build_allows_needed_theory_before_practice(self):
+        storyboard = copy.deepcopy(self.storyboard)
+        storyboard['slides'][0]['role'] = 'LEARN'
+        storyboard['slides'][0]['studentText'] = '가중치는 무엇을 더 중요하게 볼지 정하는 값입니다.'
+        storyboard['slides'][1]['role'] = 'LEARN'
+        storyboard['slides'][2]['role'] = 'LEARN'
+        report = validate_storyboard(storyboard, self.concepts, 'guided-build')
+        self.assertFalse(any(x.startswith('CONCEPT_BEFORE_INTRO:') for x in report['blockers']))
+        self.assertFalse(any(x.startswith('FIRST_STUDENT_ACTION_AFTER_PROFILE_DEADLINE:') for x in report['blockers']))
+        self.assertFalse(any(x.startswith('LEARN_RUN_TOO_LONG_FOR_PROFILE:') for x in report['blockers']))
+        self.assertEqual('guided-build', report['detail']['deliveryProfile'])
+        self.assertEqual(20.0, report['detail']['firstActionDeadlineMinutes'])
+
     def test_factory_default_concept_policy_is_course_neutral(self):
         storyboard = copy.deepcopy(self.storyboard)
         storyboard['slides'][1]['studentText'] = '가중치를 먼저 골라보세요.'
@@ -81,12 +103,12 @@ class TestContentDesign(unittest.TestCase):
         report = validate_storyboard(storyboard, self.concepts)
         self.assertIn('BUFFER_INTRODUCES_REQUIRED_CONCEPT:S7', report['blockers'])
 
-    def test_storyboard_requires_first_action_within_three_minutes(self):
+    def test_experience_first_profile_requires_first_action_within_three_minutes(self):
         storyboard = copy.deepcopy(self.storyboard)
         storyboard['slides'][0]['minutes'] = 3.5
         storyboard['slides'][5]['minutes'] = 13.0
-        report = validate_storyboard(storyboard, self.concepts)
-        self.assertIn('FIRST_STUDENT_ACTION_NOT_WITHIN_3_MINUTES', report['blockers'])
+        report = validate_storyboard(storyboard, self.concepts, 'experience-first')
+        self.assertIn('FIRST_STUDENT_ACTION_AFTER_PROFILE_DEADLINE:experience-first:3', report['blockers'])
 
     def test_quality_score_recomputes_total_and_hard_gates(self):
         quality = copy.deepcopy(self.quality)
@@ -108,6 +130,7 @@ class TestContentDesign(unittest.TestCase):
             ROOT / 'policies' / 'quality-rubric.json',
             ROOT / 'policies' / 'student-language.json',
             ROOT / 'policies' / 'concept-order.json',
+            ROOT / 'policies' / 'delivery-profiles.json',
             FIXTURE / 'concept-policy.json',
         ]
         for path in paths:
