@@ -3,6 +3,7 @@ import os, subprocess, tempfile, unicodedata, zipfile
 from pathlib import Path, PurePosixPath
 from core import ROOT, QAError, load_jsonish, sha256, html_qa
 from pptx_checks import pptx_qa
+from presentation_template import load_template_policy, presentation_template_qa
 from package_checks import verify_inventory, html_runtime_contract, runtime_report_contract, manifest_contract
 
 
@@ -58,10 +59,18 @@ def verify_private_package(course,zip_path:Path):
             hc=html_runtime_contract(base/html_asset['file'],manifest); out['htmlContract']=hc
             out['checks'].append({'name':'runtime_html_contract','status':'PASS','idCount':hc['idCount']})
         if ppt_asset:
-            pq=pptx_qa(base/ppt_asset['file']); out['pptx']=pq
+            ppt_path=base/ppt_asset['file']
+            pq=pptx_qa(ppt_path); out['pptx']=pq
             if not pq['pass']: raise QAError('PPTX structural gate failed')
             if pq['slides']!=expected_slides or pq['notes']!=expected_notes:
                 raise QAError('golden prototype slide/note count mismatch')
+            binding=course.get('presentationTemplate')
+            if binding:
+                policy,_=load_template_policy(binding.get('templateId'),binding.get('policyPath'))
+                tq=presentation_template_qa(ppt_path,policy); out['presentationTemplate']=tq
+                if not tq['pass']:
+                    raise QAError('PPTX presentation template hard gate failed: ' + '; '.join(tq['issues']))
+                out['checks'].append({'name':'presentation_template_hard_gate','status':'PASS','templateId':policy.get('templateId')})
         if ppt_asset and ppt_qa_asset:
             qj=load_jsonish(base/ppt_qa_asset['file'])
             if qj.get('sha256')!=ppt_asset['sha256'] or qj.get('slideCount')!=expected_slides or qj.get('passed') is not True or qj.get('failures'):
