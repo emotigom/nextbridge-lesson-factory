@@ -17,6 +17,7 @@ SCHEMAS = {
 LANGUAGE_POLICY = ROOT / 'policies' / 'student-language.json'
 DEFAULT_CONCEPT_POLICY = ROOT / 'policies' / 'concept-order.json'
 QUALITY_POLICY = ROOT / 'policies' / 'quality-rubric.json'
+DELIVERY_POLICY = ROOT / 'policies' / 'delivery-profiles.json'
 ACTION_ROLES = {'THINK', 'CHOOSE', 'TRY', 'TALK', 'CHECK'}
 
 
@@ -36,6 +37,16 @@ def _report(name, blockers=None, warnings=None, detail=None):
     }
 
 
+def _delivery_profile(name=None):
+    policy = load_jsonish(DELIVERY_POLICY)
+    profile_name = name or policy.get('defaultProfile', 'experience-first')
+    profile = policy.get('profiles', {}).get(profile_name)
+    if not isinstance(profile, dict):
+        profile_name = policy.get('defaultProfile', 'experience-first')
+        profile = policy.get('profiles', {}).get(profile_name, {})
+    return profile_name, profile
+
+
 def validate_source_policy(data):
     blockers = [f'SCHEMA:{e}' for e in _schema_errors(data, 'source')]
     ids = [x.get('id') for x in data.get('allowedInputs', []) if isinstance(x, dict)]
@@ -51,6 +62,7 @@ def validate_source_policy(data):
 
 def validate_course_map(data):
     blockers = [f'SCHEMA:{e}' for e in _schema_errors(data, 'map')]
+    warnings = []
     sessions = data.get('sessions', [])
     numbers = [x.get('session') for x in sessions if isinstance(x, dict)]
     if numbers != list(range(1, len(numbers) + 1)):
@@ -59,7 +71,17 @@ def validate_course_map(data):
         blockers.append('COURSE_MAP_NOT_LOCKED')
     if any(x.get('status') != 'APPROVED' for x in sessions if isinstance(x, dict)):
         blockers.append('COURSE_MAP_SESSION_NOT_APPROVED')
-    return _report('course_map', blockers, detail={'sessions': len(sessions)})
+    profile = data.get('deliveryProfile')
+    if not profile:
+        warnings.append('DELIVERY_PROFILE_NOT_EXPLICIT')
+    if profile == 'guided-build' and not data.get('practiceAnchor'):
+        blockers.append('GUIDED_BUILD_PRACTICE_ANCHOR_MISSING')
+    return _report(
+        'course_map',
+        blockers,
+        warnings,
+        {'sessions': len(sessions), 'deliveryProfile': profile or _delivery_profile()[0]},
+    )
 
 
 def validate_concept_policy(data):
@@ -98,11 +120,12 @@ def _normalized_introductions(values, concept_index):
     return ids
 
 
-def validate_storyboard(data, concept_policy=None):
+def validate_storyboard(data, concept_policy=None, delivery_profile=None):
     blockers = [f'SCHEMA:{e}' for e in _schema_errors(data, 'storyboard')]
     warnings = []
     language = load_jsonish(LANGUAGE_POLICY)
     concept_policy = concept_policy or load_jsonish(DEFAULT_CONCEPT_POLICY)
+    profile_name, profile = _delivery_profile(delivery_profile)
     concept_index = _concept_index(concept_policy)
     slides = data.get('slides', [])
     beats = data.get('teachingBeats', [])
@@ -133,6 +156,8 @@ def validate_storyboard(data, concept_policy=None):
     forbidden_hits = []
     warning_hits = []
     concept_early_hits = []
+    concept_timing = profile.get('conceptTiming', 'after-experience')
+    require_after_experience = bool(concept_policy.get('introduceAfterExperience')) and concept_timing == 'after-experience'
 
     for slide in slides:
         role = slide.get('role')
@@ -159,7 +184,7 @@ def validate_storyboard(data, concept_policy=None):
             warnings.append(f'STUDENT_TEXT_LONG:S{slide.get("slide")}:{len(text)}')
 
         current_intro = _normalized_introductions(slide.get('conceptsIntroduced', []), concept_index)
-        if concept_policy.get('introduceAfterExperience'):
+        if require_after_experience:
             for label, term_id in concept_index.items():
                 if label in text and term_id not in introduced and term_id not in current_intro:
                     concept_early_hits.append((slide.get('slide'), label))
@@ -171,18 +196,20 @@ def validate_storyboard(data, concept_policy=None):
         else:
             consecutive_learn = 0
 
-    if first_action_at is None or first_action_at >= 3.0:
-        blockers.append('FIRST_STUDENT_ACTION_NOT_WITHIN_3_MINUTES')
+    action_deadline = float(profile.get('firstActionDeadlineMinutes', 3) or 3)
+    if first_action_at is None or first_action_at >= action_deadline:
+        blockers.append(f'FIRST_STUDENT_ACTION_AFTER_PROFILE_DEADLINE:{profile_name}:{action_deadline:g}')
     if forbidden_hits:
         blockers.extend(f'STUDENT_LANGUAGE_FORBIDDEN:S{s}:{p}' for s, p in forbidden_hits)
     if concept_early_hits:
         blockers.extend(f'CONCEPT_BEFORE_INTRO:S{s}:{p}' for s, p in concept_early_hits)
     if warning_hits:
         warnings.extend(f'STUDENT_LANGUAGE_WARNING:S{s}:{p}' for s, p in warning_hits)
-    if max_consecutive_learn >= 3:
-        blockers.append('LEARN_RUN_TOO_LONG')
-    elif max_consecutive_learn == 2:
-        warnings.append('CONSECUTIVE_LEARN_SLIDES')
+    max_learn_allowed = int(profile.get('maxConsecutiveLearnSlides', 2) or 2)
+    if max_consecutive_learn > max_learn_allowed:
+        blockers.append(f'LEARN_RUN_TOO_LONG_FOR_PROFILE:{profile_name}:{max_consecutive_learn}>{max_learn_allowed}')
+    elif max_consecutive_learn == max_learn_allowed and max_learn_allowed > 1:
+        warnings.append(f'LEARN_RUN_AT_PROFILE_LIMIT:{profile_name}:{max_consecutive_learn}')
     if not 6 <= len(beats) <= 8:
         warnings.append(f'TEACHING_BEAT_COUNT_OUTSIDE_TARGET:{len(beats)}')
     if not 18 <= len(slides) <= 22:
@@ -199,6 +226,11 @@ def validate_storyboard(data, concept_policy=None):
             'coreMinutes': core_minutes,
             'fullMinutes': full_minutes,
             'firstActionAtMinute': first_action_at,
+            'deliveryProfile': profile_name,
+            'firstActionDeadlineMinutes': action_deadline,
+            'conceptTiming': concept_timing,
+            'maxConsecutiveLearnSlides': max_consecutive_learn,
+            'maxConsecutiveLearnSlidesAllowed': max_learn_allowed,
         },
     )
 
@@ -263,10 +295,11 @@ def check_bundle(bundle_dir: Path):
     storyboard_sessions = [x.get('session') for _, x in storyboards]
     if storyboard_sessions != map_sessions:
         reports.append(_report('storyboard_inventory', ['STORYBOARD_SESSION_SET_MISMATCH'], detail={'map': map_sessions, 'storyboards': storyboard_sessions}))
+    delivery_profile = course_map.get('deliveryProfile')
     for path, storyboard in storyboards:
         if storyboard.get('courseId') != course_id:
             reports.append(_report('course_id_consistency', [f'STORYBOARD_COURSE_ID_MISMATCH:{path.name}']))
-        rep = validate_storyboard(storyboard, concept_policy)
+        rep = validate_storyboard(storyboard, concept_policy, delivery_profile)
         rep['path'] = str(path.relative_to(bundle_dir))
         reports.append(rep)
 
