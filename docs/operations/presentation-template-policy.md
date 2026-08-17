@@ -46,6 +46,14 @@
 
 하나라도 다르면 `presentation_template_hard_gate`는 FAIL이다.
 
+패키징 전에 PPTX만 빠르게 확인할 수도 있다.
+
+```bash
+python3 tools/lessonctl/presentation_template.py \
+  --pptx /secure/candidate.pptx \
+  --template-id 2026-visiting-ai
+```
+
 검사 구현:
 
 - `tools/lessonctl/presentation_template.py`
