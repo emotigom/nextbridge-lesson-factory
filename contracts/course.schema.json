@@ -31,6 +31,15 @@
     "target": {"type": "object","additionalProperties": false,"required": ["audience","sessions","minutesPerSession"],"properties": {"audience": {"type": "string"},"sessions": {"type": "integer","minimum": 1},"minutesPerSession": {"type": "integer","minimum": 1}}},
     "sourceLock": {"type": "object","additionalProperties": false,"required": ["packageSha256","prototypePptxSha256","runtimeHtmlSha256","stateRunnerSha256","runtimeQaSha256"],"properties": {"packageSha256": {"type": "string","pattern": "^[0-9a-f]{64}$"},"prototypePptxSha256": {"type": "string","pattern": "^[0-9a-f]{64}$"},"runtimeHtmlSha256": {"type": "string","pattern": "^[0-9a-f]{64}$"},"stateRunnerSha256": {"type": "string","pattern": "^[0-9a-f]{64}$"},"runtimeQaSha256": {"type": "string","pattern": "^[0-9a-f]{64}$"}}},
     "goldenFixture": {"type": "string","pattern": "^fixtures/golden/.+\\.json$"},
+    "presentationTemplate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["templateId","policyPath"],
+      "properties": {
+        "templateId": {"type": "string", "minLength": 1},
+        "policyPath": {"type": "string", "pattern": "^policies/presentation-templates/.+\\.json$"}
+      }
+    },
     "design": {
       "type": "object",
       "additionalProperties": false,
