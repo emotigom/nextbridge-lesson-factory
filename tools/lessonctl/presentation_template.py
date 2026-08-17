@@ -1,4 +1,6 @@
 from __future__ import annotations
+import argparse
+import json
 import re
 import zipfile
 from pathlib import Path, PurePosixPath
@@ -191,3 +193,30 @@ def presentation_template_qa(path: Path, policy: dict):
         'issues': sorted(set(issues)),
         'detail': detail,
     }
+
+
+def main():
+    parser = argparse.ArgumentParser(prog='presentation_template')
+    parser.add_argument('--pptx', required=True)
+    parser.add_argument('--template-id')
+    parser.add_argument('--policy')
+    parser.add_argument('--json', dest='jsonout')
+    args = parser.parse_args()
+    try:
+        policy, policy_path = load_template_policy(args.template_id, args.policy)
+        report = presentation_template_qa(Path(args.pptx), policy)
+        report['policyPath'] = str(policy_path.relative_to(ROOT))
+        text = json.dumps(report, ensure_ascii=False, indent=2) + '\n'
+        if args.jsonout:
+            out = Path(args.jsonout)
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(text, encoding='utf-8')
+        print(text, end='')
+        raise SystemExit(0 if report['pass'] else 2)
+    except (QAError, OSError, zipfile.BadZipFile, ET.ParseError, json.JSONDecodeError) as exc:
+        print(json.dumps({'status':'FAIL','error':str(exc)}, ensure_ascii=False, indent=2))
+        raise SystemExit(2)
+
+
+if __name__ == '__main__':
+    main()
