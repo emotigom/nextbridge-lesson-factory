@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0.0",
+  "templateId": "2026-visiting-ai",
+  "scope": "2026 찾아가는 AI교육 지원 프로그램",
+  "requiredForScopes": [
+    "2026 찾아가는 AI교육 지원 프로그램",
+    "2026 찾아가는 AI교실 교육 프로그램"
+  ],
+  "storagePolicy": {
+    "templateBinaryInPublicGit": false,
+    "templateBinaryLocation": "private-workspace-or-approved-private-storage",
+    "publicRecordContains": [
+      "templateId",
+      "scope",
+      "sha256",
+      "structuralFingerprint"
+    ]
+  },
+  "sourceLock": {
+    "sha256": "70b5c69fc666e54b29233ae97fd964b38c191ca9ebed48c4862ac14cced56117",
+    "fileNameObserved": "템플릿(1).pptx",
+    "observedAt": "2026-08-17T16:45:00+09:00"
+  },
+  "structuralFingerprint": {
+    "slideWidthEmu": 12192000,
+    "slideHeightEmu": 6858000,
+    "slideCountInTemplateFile": 5,
+    "slideMasterCount": 1,
+    "slideLayoutCount": 6,
+    "layoutNames": [
+      "제목 슬라이드",
+      "사용자 지정 레이아웃",
+      "1_사용자 지정 레이아웃",
+      "2_사용자 지정 레이아웃",
+      "3_사용자 지정 레이아웃",
+      "4_사용자 지정 레이아웃"
+    ],
+    "coverTextMustContain": [
+      "2026년 찾아가는",
+      "AI교육 지원 프로그램 운영"
+    ],
+    "closingTextMustContain": [
+      "2026년 찾아가는 AI교실 교육 프로그램",
+      "감사합니다."
+    ]
+  },
+  "candidatePptxCustomProperties": {
+    "NextbridgeTemplateId": "2026-visiting-ai",
+    "NextbridgeTemplateSha256": "70b5c69fc666e54b29233ae97fd964b38c191ca9ebed48c4862ac14cced56117",
+    "NextbridgeTemplateScope": "2026 찾아가는 AI교육 지원 프로그램",
+    "NextbridgeTemplatePolicy": "policies/presentation-templates/2026-visiting-ai.json"
+  },
+  "enforcement": {
+    "contentDesign": "Template use is required before PPTX/manual Gate work for matching 2026 visiting-AI courses.",
+    "manualGateBoundary": "If the PPTX is rebuilt with this template after manual Gate evidence is collected, the PPTX and package SHA change and affected evidence becomes stale.",
+    "publicDistribution": "The template binary and rendered official visual assets require separate rights review before public distribution."
+  }
+}
