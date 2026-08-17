@@ -2,5 +2,5 @@
   "schemaVersion": "1.0.0",
   "introduceAfterExperience": true,
   "terms": [],
-  "notes": "Factory-wide default. Each design bundle may provide concept-policy.json with course-specific protected terms. Teacher notes may use preparation terminology earlier; the order gate applies to studentText."
+  "notes": "Factory-wide backward-compatible default for the experience-first delivery profile. A course deliveryProfile may explicitly allow needed theory before guided practice; in that case the delivery profile controls timing while this file still defines protected concept labels. Teacher notes may use preparation terminology earlier; concept-order gates apply to studentText."
 }
