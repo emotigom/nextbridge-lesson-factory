@@ -103,12 +103,13 @@ def validate_handoff(handoff):
         if approved:
             approved_sessions.append(i)
 
+    delivery_profile = handoff['courseMap'].get('deliveryProfile')
     storyboard_sessions = []
     for storyboard in handoff.get('storyboards', []):
         storyboard_sessions.append(storyboard.get('session'))
         if storyboard.get('courseId') != cid:
             blockers.append(f'COURSE_ID_MISMATCH:storyboard:{storyboard.get("session")}')
-        report = validate_storyboard(storyboard, handoff['conceptPolicy'])
+        report = validate_storyboard(storyboard, handoff['conceptPolicy'], delivery_profile)
         blockers.extend(f'storyboard-{storyboard.get("session")}:{x}' for x in report.get('blockers', []))
         warnings.extend(f'storyboard-{storyboard.get("session")}:{x}' for x in report.get('warnings', []))
     if storyboard_sessions != approved_sessions:
