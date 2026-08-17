@@ -1,0 +1,49 @@
+{
+  "policyVersion": "1.0.0",
+  "defaultProfile": "experience-first",
+  "profiles": {
+    "experience-first": {
+      "firstActionDeadlineMinutes": 3,
+      "maxConsecutiveLearnSlides": 2,
+      "conceptTiming": "after-experience",
+      "recommendedRhythm": [
+        "EXPERIENCE",
+        "COMPARE_OR_NOTICE",
+        "STUDENT_LANGUAGE",
+        "NAME_THE_CONCEPT",
+        "APPLY_AGAIN"
+      ]
+    },
+    "guided-build": {
+      "firstActionDeadlineMinutes": 20,
+      "maxConsecutiveLearnSlides": 4,
+      "conceptTiming": "before-practice-when-needed",
+      "recommendedRhythm": [
+        "TOPIC_CONTEXT",
+        "NEEDED_THEORY",
+        "VIDEO_OR_COMPLETE_EXAMPLE",
+        "TASK_BRIEF",
+        "GUIDED_PRACTICE",
+        "CUSTOMIZE",
+        "CHECK_RESULT"
+      ],
+      "typicalRhythmMinutes": {
+        "explanation": 15,
+        "practice": 20
+      }
+    },
+    "explain-practice": {
+      "firstActionDeadlineMinutes": 20,
+      "maxConsecutiveLearnSlides": 4,
+      "conceptTiming": "before-practice-when-needed",
+      "recommendedRhythm": [
+        "CONTEXT",
+        "EXPLANATION",
+        "DEMO_OR_VIDEO",
+        "PRACTICE",
+        "CHECK"
+      ]
+    }
+  },
+  "notes": "Delivery profile is a course-level choice, not a universal pedagogy ranking. guided-build is intended for tool-based lessons where an instructor explains only the theory needed for the build, shows a video or complete example, briefs the task, builds alongside students, then lets students customize and check the result. The minute values are guardrails, not fixed lesson lengths."
+}
