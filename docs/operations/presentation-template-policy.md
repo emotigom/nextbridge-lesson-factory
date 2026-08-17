@@ -10,7 +10,22 @@
 
 - `policies/presentation-templates/2026-visiting-ai.json`
 
-## Candidate PPTX 기준
+## Course binding
+
+해당 사업의 candidate course contract는 `presentationTemplate`을 명시한다.
+
+```json
+{
+  "presentationTemplate": {
+    "templateId": "2026-visiting-ai",
+    "policyPath": "policies/presentation-templates/2026-visiting-ai.json"
+  }
+}
+```
+
+`presentationTemplate`이 있는 course를 private package replay로 검사할 때 Factory는 PPTX 구조 검사 뒤에 presentation-template Hard Gate를 자동 실행한다.
+
+## Candidate PPTX Hard Gate
 
 해당 범위의 PPTX candidate는 다음 custom properties를 포함해야 한다.
 
@@ -18,6 +33,24 @@
 - `NextbridgeTemplateSha256`
 - `NextbridgeTemplateScope`
 - `NextbridgeTemplatePolicy`
+
+그리고 등록된 policy의 구조 지문과 일치해야 한다.
+
+- slide size
+- slide master 수
+- slide layout 수와 이름
+- 모든 slide → layout binding
+- 모든 layout → master binding
+- 표지 필수 문구
+- 종료 슬라이드 필수 문구
+
+하나라도 다르면 `presentation_template_hard_gate`는 FAIL이다.
+
+검사 구현:
+
+- `tools/lessonctl/presentation_template.py`
+- `tools/lessonctl/private_replay.py`
+- `tests/test_presentation_template.py`
 
 템플릿을 나중에 적용하면 PPTX SHA와 실행패키지 SHA가 바뀐다. 따라서 Windows PowerPoint, 폰트 이식성, 독립 강사 리허설, 학생 파일럿 등 이미 수집된 수동 Gate evidence는 새 SHA 기준으로 다시 보아야 한다.
 
